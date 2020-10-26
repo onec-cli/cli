@@ -18,11 +18,9 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-
 	"github.com/spf13/cobra"
-
-	v8 "github.com/khorevaa/go-v8platform"
+	"github.com/v8platform/runner"
+	"github.com/v8platform/v8"
 )
 
 // runCmd represents the run command
@@ -37,10 +35,17 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("run called")
-		err := v8.Run(v8.NewFileIB("C:\\w\\tmp\\new"), v8.CreateInfobase())
-		if err != nil {
-			log.Fatal(err)
-		}
+		// было
+		//err := v8.Run(v8.NewFileIB("C:\\w\\tmp\\new"), v8.CreateInfobase())
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
+		// стало
+		runner.Run(v8.NewFileIB("C:\\w\\tmp\\new"), v8.CreateFileInfobase(""))
+		// или
+		//infobase := v8.CreateFileInfobase("C:\\w\\tmp\\new")
+		//v8.Run(v8.NewFileIB("C:\\w\\tmp\\new"), infobase)
+		fmt.Println("run end")
 	},
 }
 
