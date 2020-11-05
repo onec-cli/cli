@@ -28,7 +28,7 @@ $CLI - program name (draft = onec-cli)
 
 ### config
 
-| | |
+|  | |
 | --- | --- |
 | Command aliases | c |
 | Command options | |
@@ -93,7 +93,7 @@ $CLI **p**latform **r**un -flags
 .......... `DEV-1` .........
 
 ```
-$CLI t --id="DEV-1" --spec="./test.json ./vanessa-automation.epf
+$CLI t --id=DEV-1 --spec=./test.json ./vanessa-automation.epf
 ```
 
 ## bootstrap
