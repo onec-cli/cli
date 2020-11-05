@@ -19,6 +19,7 @@ $CLI - program name (draft = onec-cli)
 | --- | --- |
 | `-u, --user, --db-user` | [Default: ""] db-user |
 | `-p, --password, --db-password, --db-pwd` | [Default: ""] db-password |
+| `-b, --ib` | [Default: "./"]  | //TODO
 ...
 
 ## Environment Variables
