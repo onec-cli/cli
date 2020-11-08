@@ -21,6 +21,16 @@ $CLI - program name (draft = onec-cli)
 | `-p, --password, --db-password, --db-pwd` | [Default: ""] db-password |
 ...
 
+$CLI uses the following precedence order. Each item takes precedence over the item below it:
+
+* flag
+* env
+* config
+* key/value store // TODO
+* default
+
+**Important**: configuration keys are case-insensitive.
+
 ## Environment Variables
 ...
 

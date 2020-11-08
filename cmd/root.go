@@ -18,15 +18,15 @@ package cmd
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
+	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var user string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -60,10 +60,13 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
+	rootCmd.PersistentFlags().StringVar(&user, "user", "", "user") //todo test
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -82,8 +85,12 @@ func initConfig() {
 		// Search config in home directory with name ".cli" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".cli")
+		viper.SetConfigType("json")
+
+		//viper.WriteConfigAs(filepath.Join(home, ".cli.json"))//todo test
 	}
 
+	viper.SetEnvPrefix("cli")
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
