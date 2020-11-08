@@ -25,6 +25,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const APP_NAME = "onec" // todo temp
+
 var cfgFile string
 var user string
 
@@ -84,13 +86,13 @@ func initConfig() {
 
 		// Search config in home directory with name ".cli" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".cli")
+		viper.SetConfigName("." + APP_NAME)
 		viper.SetConfigType("json")
 
 		//viper.WriteConfigAs(filepath.Join(home, ".cli.json"))//todo test
 	}
 
-	viper.SetEnvPrefix("cli")
+	viper.SetEnvPrefix(APP_NAME)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
