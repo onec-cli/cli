@@ -17,8 +17,10 @@ $CLI - program name (draft = onec-cli)
 
 | global-options | Description |
 | --- | --- |
-| `-u, --user, --db-user` | [Default: ""] db-user |
-| `-p, --password, --db-password, --db-pwd` | [Default: ""] db-password |
+| `-d, --debug` | [Default: false] //TODO |
+// TODO later
+| `-u, --user` | [Default: ""] db-user |
+| `-p, --password` | [Default: ""] db-password |
 | `-b, --ib` | [Default: "./"]  | //TODO
 ...
 
@@ -39,7 +41,7 @@ $CLI uses the following precedence order. Each item takes precedence over the it
 
 ### config
 
-|  | |
+| | |
 | --- | --- |
 | Command aliases | c |
 | Command options | |
