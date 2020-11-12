@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/onec-cli/cli/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/v8platform/errors"
@@ -30,9 +31,11 @@ to quickly create a Cobra application.`,
 
 		//viper.GetString("user"), viper.GetString("password")
 		// todo https://github.com/v8platform/v8/issues/2
-		infobase := newInfobase(args[0])
-
-		err := v8.Run(infobase, v8.CreateFileInfobase(""))
+		infobase, err := utils.NewInfobase(args[0])
+		if err != nil {
+			log.Fatalln(err)
+		}
+		err = v8.Run(infobase, v8.CreateFileInfobase(""))
 
 		// todo чёт неудобно
 		if err != nil {

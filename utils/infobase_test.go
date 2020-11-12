@@ -12,119 +12,139 @@ func TestGetInfobase(t *testing.T) {
 	//	t.Skip("skipping test in short mode.")
 	//}
 	type args struct {
-		connectionString string
+		s string
 	}
 	tests := []struct {
-		name string
-		args args
-		want v8.Infobase
+		name    string
+		args    args
+		want    v8.Infobase
+		wantErr bool
 	}{
 		{
 			"Empty",
-			args{connectionString: ""},
+			args{s: ""},
 			nil,
+			true,
 		},
 		{
 			"Spaces and Cyrillic",
-			args{connectionString: " /F./f_Фл_o "},
-			v8.FileInfoBase{
+			args{s: " /F./f_Фл_o "},
+			&v8.FileInfoBase{
 				InfoBase: v8.InfoBase{},
 				File:     "./f_Фл_o",
 				Locale:   "",
 			},
+			false,
 		},
 		{
 			"Prefix UPPER vs lower",
-			args{connectionString: "/f./foo"},
-			v8.FileInfoBase{
+			args{s: "/f./foo"},
+			&v8.FileInfoBase{
 				InfoBase: v8.InfoBase{},
 				File:     "./foo",
 				Locale:   "",
 			},
+			false,
 		},
 		{
 			"File relative path",
-			args{connectionString: "/F./foo"},
-			v8.FileInfoBase{
+			args{s: "/F./foo"},
+			&v8.FileInfoBase{
 				InfoBase: v8.InfoBase{},
 				File:     "./foo",
 				Locale:   "",
 			},
+			false,
 		},
 		{
 			"File=",
-			args{connectionString: "File=\"C:\\foo\\boo\";"},
-			v8.FileInfoBase{
+			args{s: "File=\"C:\\foo\\boo\";"},
+			&v8.FileInfoBase{
 				InfoBase: v8.InfoBase{},
-				File:     "C:\\foo\\boo",
+				File:     `C:\foo\boo`,
 				Locale:   "",
 			},
+			false,
+		},
+		{
+			"Server invalid string",
+			args{s: "/Sfoo"},
+			nil,
+			true,
 		},
 		{
 			"Server sep",
-			args{connectionString: "/Sfoo\\boo"},
-			v8.ServerInfoBase{
+			args{s: "/Sfoo\\boo"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "foo",
 				Ref:      "boo",
 			},
-		},
-		{
-			"Server bad sep",
-			args{connectionString: "/Sfoo\\boo/fff"},
-			nil,
+			false,
 		},
 		{
 			"Server tcp",
-			args{connectionString: "/Stcp://foo:1641/boo"},
-			v8.ServerInfoBase{
+			args{s: "/Stcp://foo:1641/boo"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "tcp://foo:1641",
 				Ref:      "boo",
 			},
+			false,
 		},
 		{
 			"Server IPv6",
-			args{connectionString: "/S[fe10::c47b:90b7:fa32:a2fa%12]/boo"},
-			v8.ServerInfoBase{
+			args{s: "/S[fe10::c47b:90b7:fa32:a2fa%12]/boo"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "[fe10::c47b:90b7:fa32:a2fa%12]",
 				Ref:      "boo",
 			},
+			false,
 		},
 		{
 			"Server multi-claster",
-			args{connectionString: "/S127.0.0.1:1541,127.0.0.2:1542/boo"},
-			v8.ServerInfoBase{
+			args{s: "/S127.0.0.1:1541,127.0.0.2:1542/boo"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "127.0.0.1:1541,127.0.0.2:1542",
 				Ref:      "boo",
 			},
+			false,
 		},
 		{
 			"Server",
-			args{connectionString: "/S127.0.0.1:1541/boo"},
-			v8.ServerInfoBase{
+			args{s: "/S127.0.0.1:1541/boo"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "127.0.0.1:1541",
 				Ref:      "boo",
 			},
+			false,
 		},
 		{
 			"Srvr= Ref= ",
-			args{connectionString: "Srvr=\"foo\";Ref=\"boo\";"},
-			v8.ServerInfoBase{
+			args{s: "Srvr=\"foo\";Ref=\"boo\";"},
+			&v8.ServerInfoBase{
 				InfoBase: v8.InfoBase{},
 				Srvr:     "foo",
 				Ref:      "boo",
 			},
+			false,
 		},
 	}
 	for _, tt := range tests {
+
 		t.Run(tt.name, func(t *testing.T) {
-			if got := utils.GetInfobase(tt.args.connectionString); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetInfobase() = %v, want %v", got, tt.want)
+			got, err := utils.NewInfobase(tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewInfobase() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewInfobase() got = %v, want %v", got, tt.want)
 			}
 		})
+
 	}
 }
