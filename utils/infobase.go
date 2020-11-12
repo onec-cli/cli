@@ -10,24 +10,18 @@ import (
 	"strings"
 )
 
-var _ v8.Command = (*CreateInfobase)(nil)
+var _ v8.Command = (*connectionCreateString)(nil)
 
-type CreateInfobase struct {
+type ConnectionString struct {
 	ConnectString string
 }
 
-func (c CreateInfobase) Command() string {
-	return runner.CreateInfobase
+type connectionCreateString struct {
+	ConnectString string
+	values        []string
 }
 
-func (c CreateInfobase) Check() error {
-
-	// TODO Сюда можно добавить любые проверки
-	return nil
-}
-
-func (c CreateInfobase) Values() []string {
-
+func (c *connectionCreateString) parse() error {
 	var values []string
 
 	switch {
@@ -35,56 +29,61 @@ func (c CreateInfobase) Values() []string {
 
 		values = append(values, "File="+strings.TrimLeft(c.ConnectString, "/F"))
 
-	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/S"):
-
-		path := strings.TrimLeft(c.ConnectString, "/S")
-		r := strings.Replace(path, "\\", "/", 1)
-		i := strings.LastIndex(r, "/")
-		if i < 0 {
-			log.Fatalf("invalid format for Srvr: %s", c.ConnectString)
-		}
-		values = append(values, "Srvr="+r[:i])
-		values = append(values, "Ref="+r[i+1:])
-
-		// TODO А это откуда брать в данном случае?
-		//";DBMS=" + serverIB.DBMS +
-		//";DBSrvr=" + serverIB.DBSrvr +
-		//";DBUID=" + serverIB.DBUID +
-		//";DBPwd=" + serverIB.DBPwd +
-		//";DB=" + serverIB.DB +
-		//";SQLYOffs=0"
-
-	case strings.HasPrefix(c.ConnectString, "File=") ||
-		strings.HasPrefix(c.ConnectString, "Srvr="):
+	case strings.Contains(c.ConnectString, "File=") ||
+		strings.Contains(c.ConnectString, "Srvr="):
 
 		values = strings.Split(c.ConnectString, ";")
 		// TODO Надо почистить от пустых строк и артифактов
-
+	default:
+		return errors.New("invalid connection string format")
 	}
 
-	return values
+	c.values = values
+
+	return nil
+}
+func (c connectionCreateString) Command() string {
+	return runner.CreateInfobase
+}
+func (c connectionCreateString) Check() error {
+
+	// TODO Сюда можно добавить любые проверки
+	return nil
+}
+func (c connectionCreateString) Values() []string {
+	return c.values
 }
 
-func (c CreateInfobase) Infobase() v8.Infobase {
+func (c ConnectionString) CreateInfobase() (v8.Command, error) {
+
+	command := connectionCreateString{
+		ConnectString: c.ConnectString,
+	}
+	err := command.parse()
+	if err != nil {
+		return nil, err
+	}
+	return command, nil
+}
+
+func (c ConnectionString) Infobase() v8.Infobase {
 	switch {
 	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/F") ||
-		strings.HasPrefix(c.ConnectString, "File="):
+		strings.Contains(c.ConnectString, "File="):
 
 		var path string
 		if strings.HasPrefix(strings.ToUpper(c.ConnectString), "/F") {
 			path = strings.TrimLeft(c.ConnectString, "/F")
 		} else {
-			// чего то там сделать
+			// TODO Эту ветку надо доделать
 		}
 
 		return v8.FileInfoBase{
-			//InfoBase: v8.InfoBase{},
 			File: path,
-			//Locale:   "", //TODO Добавить получение locale из строки
 		}
 
 	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/S") ||
-		strings.HasPrefix(c.ConnectString, "Srvr="):
+		strings.Contains(c.ConnectString, "Srvr="):
 
 		var srvr, ref string
 
@@ -98,7 +97,7 @@ func (c CreateInfobase) Infobase() v8.Infobase {
 			srvr, ref = r[:i], r[i+1:]
 		} else {
 
-			// чего то там сделать для строки подлчения вида "Srvr="
+			// TODO Эту ветку надо доделать
 		}
 
 		return v8.ServerInfoBase{

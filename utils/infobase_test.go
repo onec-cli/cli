@@ -180,7 +180,7 @@ func TestCreateInfobase_Infobase(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := utils.CreateInfobase{
+			c := utils.ConnectionString{
 				ConnectString: tt.fields.ConnectString,
 			}
 			if got := c.Infobase(); !reflect.DeepEqual(got, tt.want) {
@@ -221,10 +221,14 @@ func TestCreateInfobase_Values(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := utils.CreateInfobase{
+			c := utils.ConnectionString{
 				ConnectString: tt.fields.ConnectString,
 			}
-			if got := c.Values(); !reflect.DeepEqual(got, tt.want) {
+			cmd, err := c.CreateInfobase()
+			if err != nil {
+				t.Errorf("error parse connecting string <%v>", err)
+			}
+			if got := cmd.Values(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Values() = %v, want %v", got, tt.want)
 			}
 		})
