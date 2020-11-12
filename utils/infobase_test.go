@@ -148,3 +148,85 @@ func TestGetInfobase(t *testing.T) {
 
 	}
 }
+
+func TestCreateInfobase_Infobase(t *testing.T) {
+	type fields struct {
+		ConnectString string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   v8.Infobase
+	}{
+		{
+			name: "server",
+			fields: fields{
+				ConnectString: "/S127.0.0.1:1541,127.0.0.2:1542/boo",
+			},
+			want: v8.ServerInfoBase{
+				Srvr: "127.0.0.1:1541,127.0.0.2:1542",
+				Ref:  "boo",
+			},
+		},
+		{
+			name: "file",
+			fields: fields{
+				ConnectString: "/F./foo",
+			},
+			want: v8.FileInfoBase{
+				File: "./foo",
+			},
+		}, // TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := utils.CreateInfobase{
+				ConnectString: tt.fields.ConnectString,
+			}
+			if got := c.Infobase(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Infobase() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCreateInfobase_Values(t *testing.T) {
+	type fields struct {
+		ConnectString string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   []string
+	}{
+		{
+			name: "file",
+			fields: fields{
+				ConnectString: "/F./foo",
+			},
+			want: []string{
+				"File=./foo",
+			},
+		}, // TODO: Add test cases.
+		{
+			name: "server",
+			fields: fields{
+				ConnectString: "/S127.0.0.1:1541,127.0.0.2:1542/boo",
+			},
+			want: []string{
+				"Srvr=127.0.0.1:1541,127.0.0.2:1542",
+				"Ref=boo",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := utils.CreateInfobase{
+				ConnectString: tt.fields.ConnectString,
+			}
+			if got := c.Values(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Values() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
