@@ -31,11 +31,20 @@ to quickly create a Cobra application.`,
 
 		//viper.GetString("user"), viper.GetString("password")
 		// todo https://github.com/v8platform/v8/issues/2
-		infobase, err := utils.NewInfobase(args[0])
+
+		conn := utils.ConnectionString{
+			ConnectString: args[0],
+		}
+
+		emptyWhere := v8.FileInfoBase{}
+
+		what, err := conn.CreateInfobase()
+
 		if err != nil {
 			log.Fatalln(err)
 		}
-		err = v8.Run(infobase, v8.CreateFileInfobase(""))
+
+		err = v8.Run(emptyWhere, what)
 
 		// todo чёт неудобно
 		if err != nil {
@@ -46,6 +55,9 @@ to quickly create a Cobra application.`,
 			}
 			log.Fatalln(err)
 		}
+
+		infobase := conn.Infobase()
+
 		log.Println("Infobase created: " + infobase.Path())
 	},
 }

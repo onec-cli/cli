@@ -3,10 +3,110 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"github.com/v8platform/runner"
 	v8 "github.com/v8platform/v8"
+	"log"
 	"reflect"
 	"strings"
 )
+
+var _ v8.Command = (*connectionCreateString)(nil)
+
+type ConnectionString struct {
+	ConnectString string
+}
+
+type connectionCreateString struct {
+	ConnectString string
+	values        []string
+}
+
+func (c *connectionCreateString) parse() error {
+	var values []string
+
+	switch {
+	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/F"):
+
+		values = append(values, "File="+strings.TrimLeft(c.ConnectString, "/F"))
+
+	case strings.Contains(c.ConnectString, "File=") ||
+		strings.Contains(c.ConnectString, "Srvr="):
+
+		values = strings.Split(c.ConnectString, ";")
+		// TODO Надо почистить от пустых строк и артифактов
+	default:
+		return errors.New("invalid connection string format")
+	}
+
+	c.values = values
+
+	return nil
+}
+func (c connectionCreateString) Command() string {
+	return runner.CreateInfobase
+}
+func (c connectionCreateString) Check() error {
+
+	// TODO Сюда можно добавить любые проверки
+	return nil
+}
+func (c connectionCreateString) Values() []string {
+	return c.values
+}
+
+func (c ConnectionString) CreateInfobase() (v8.Command, error) {
+
+	command := connectionCreateString{
+		ConnectString: c.ConnectString,
+	}
+	err := command.parse()
+	if err != nil {
+		return nil, err
+	}
+	return command, nil
+}
+
+func (c ConnectionString) Infobase() v8.Infobase {
+	switch {
+	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/F") ||
+		strings.Contains(c.ConnectString, "File="):
+
+		var path string
+		if strings.HasPrefix(strings.ToUpper(c.ConnectString), "/F") {
+			path = strings.TrimLeft(c.ConnectString, "/F")
+		} else {
+			// TODO Эту ветку надо доделать
+		}
+
+		return v8.FileInfoBase{
+			File: path,
+		}
+
+	case strings.HasPrefix(strings.ToUpper(c.ConnectString), "/S") ||
+		strings.Contains(c.ConnectString, "Srvr="):
+
+		var srvr, ref string
+
+		if strings.HasPrefix(strings.ToUpper(c.ConnectString), "/S") {
+			path := strings.TrimLeft(c.ConnectString, "/S")
+			r := strings.Replace(path, "\\", "/", 1)
+			i := strings.LastIndex(r, "/")
+			if i < 0 {
+				log.Fatalf("invalid format for Srvr: %s", c.ConnectString)
+			}
+			srvr, ref = r[:i], r[i+1:]
+		} else {
+
+			// TODO Эту ветку надо доделать
+		}
+
+		return v8.ServerInfoBase{
+			Srvr: srvr,
+			Ref:  ref,
+		}
+	}
+	return nil
+}
 
 func NewInfobase(s string) (v8.Infobase, error) {
 
