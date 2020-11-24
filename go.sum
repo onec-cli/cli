@@ -213,6 +213,8 @@ github.com/v8platform/marshaler v0.1.1/go.mod h1:te7WaUpacxK3+jPl1Q9JtkxdNrgtxyA
 github.com/v8platform/runner v0.0.0-20200630132946-b282ee2b45e9/go.mod h1:k6Uxq8zjwUpcoswG0/OeJ60i91yeMKxBuPAHZbtJrSc=
 github.com/v8platform/runner v0.2.1 h1:e9oJi1YaFeuEciLXWzKA3AWw1eFRnU5Nr8CC9vGwVCk=
 github.com/v8platform/runner v0.2.1/go.mod h1:E6/JasS7ZNZRPwyQTtSk8i9Iq+yY0eel8dOiASCifGc=
+github.com/v8platform/runner v0.3.0 h1:COwq2JzxvmlwpeLgnZtyH0qcUuLmEhfri9FnZSf0PnU=
+github.com/v8platform/runner v0.3.0/go.mod h1:HAprOTYNuVMOyXLYGEL1Y4+BHzkrF46jB/h4Bn7TRUw=
 github.com/v8platform/v8 v8.0.0-20201110045028-6781c0090fc0 h1:5IkAiDmNYGfr+mhMHvCJu1fKozRVu50L5fec2yOfcyY=
 github.com/v8platform/v8 v8.0.0-20201110045028-6781c0090fc0/go.mod h1:5iYx8R+bG9JKl1pxmvsFW9T4uLRourgBVyeecy3BWPs=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=

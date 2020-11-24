@@ -1,12 +1,13 @@
 package cmd
 
 import (
-	"github.com/onec-cli/cli/utils"
+	"errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/v8platform/errors"
-	"github.com/v8platform/v8"
+	v8errors "github.com/v8platform/errors"
+	"github.com/v8platform/runner"
 	"log"
+	"strings"
 )
 
 //type createOptions struct {
@@ -32,42 +33,29 @@ to quickly create a Cobra application.`,
 		//viper.GetString("user"), viper.GetString("password")
 		// todo https://github.com/v8platform/v8/issues/2
 
-		conn := utils.ConnectionString{
-			ConnectString: args[0],
-		}
-
-		emptyWhere := v8.FileInfoBase{}
-
-		what, err := conn.CreateInfobase()
+		where := new(infobase)
+		what, err := CreateInfobase(args[0])
 
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		err = v8.Run(emptyWhere, what)
+		err = runner.Run(where, what)
 
 		// todo чёт неудобно
 		if err != nil {
-			errorContext := errors.GetErrorContext(err)
+			errorContext := v8errors.GetErrorContext(err)
 			out, ok := errorContext["message"]
 			if ok {
-				err = errors.Internal.Wrap(err, out)
+				err = v8errors.Internal.Wrap(err, out)
 			}
 			log.Fatalln(err)
 		}
 
-		infobase := conn.Infobase()
+		//	infobase := conn.Infobase()
 
-		log.Println("Infobase created: " + infobase.Path())
+		//	log.Println("infobase created: " + infobase.ConnectionString())
 	},
-}
-
-func newInfobase(connectionString string) v8.Infobase {
-
-	path := connectionString
-	v := v8.NewFileIB(path)
-
-	return v
 }
 
 func init() {
@@ -88,4 +76,55 @@ func init() {
 	// Viper default
 	viper.SetDefault("user", "")
 	viper.SetDefault("password", "")
+}
+
+type infobase struct{}
+
+func (i *infobase) ConnectionString() string {
+	return ""
+}
+
+type connectionString struct {
+	connectionString string
+	values           []string
+}
+
+func (c *connectionString) Command() string {
+	return runner.CreateInfobase
+}
+
+func (c *connectionString) Check() error {
+	return nil
+}
+
+func (c *connectionString) Values() []string {
+	return c.values
+}
+
+func (c *connectionString) parse() error {
+
+	switch {
+	case strings.HasPrefix(strings.ToUpper(c.connectionString), "/F"):
+
+		c.values = append(c.values, "File="+strings.TrimLeft(c.connectionString, "/F"))
+
+	case strings.Contains(c.connectionString, "File=") ||
+		strings.Contains(c.connectionString, "Srvr="):
+
+		c.values = strings.Split(c.connectionString, ";")
+		// TODO Надо почистить от пустых строк и артифактов
+	default:
+		return errors.New("invalid connection string format")
+	}
+
+	return nil
+}
+
+func CreateInfobase(c string) (runner.Command, error) {
+	command := connectionString{connectionString: c}
+	err := command.parse()
+	if err != nil {
+		return nil, err
+	}
+	return &command, nil
 }
