@@ -159,6 +159,16 @@ func Test_connectionString_parse(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "case sensitivity",
+			fields: fields{
+				connectionString: "FiLE=./foo",
+			},
+			want: []string{
+				`FiLE=./foo`,
+			},
+			wantErr: false,
+		},
+		{
 			name: "/F",
 			fields: fields{
 				connectionString: "/F./foo",
@@ -285,6 +295,50 @@ func Test_connectionString_parse(t *testing.T) {
 			},
 			want: []string{
 				`Srvr="foo"`,
+				`Ref=boo`,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Ref= Srvr=",
+			fields: fields{
+				connectionString: `Ref=boo;Srvr="foo";`,
+			},
+			want: []string{
+				`Ref=boo`,
+				`Srvr="foo"`,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Srvr= Ref= tcp",
+			fields: fields{
+				connectionString: `Srvr=tcp://foo:1641;Ref=boo`,
+			},
+			want: []string{
+				`Srvr=tcp://foo:1641`,
+				`Ref=boo`,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Srvr= Ref= IPv6",
+			fields: fields{
+				connectionString: `Srvr=[fe10::c47b:90b7:fa32:a2fa%12];Ref=boo`,
+			},
+			want: []string{
+				`Srvr=[fe10::c47b:90b7:fa32:a2fa%12]`,
+				`Ref=boo`,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Srvr= Ref= multi-claster",
+			fields: fields{
+				connectionString: `Srvr=127.0.0.1:1541,127.0.0.2:1542;Ref=boo`,
+			},
+			want: []string{
+				`Srvr=127.0.0.1:1541,127.0.0.2:1542`,
 				`Ref=boo`,
 			},
 			wantErr: false,

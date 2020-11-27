@@ -62,7 +62,7 @@ func (c *connectionString) parse() error {
 		}
 		srv, ref := "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " ")
 		c.values = append(c.values, srv, ref)
-	case strings.Contains(s, "File=") || strings.Contains(s, "Srvr="):
+	case strings.Contains(strings.ToUpper(s), "FILE=") || strings.Contains(strings.ToUpper(s), "SRVR="):
 		c.values = strings.Split(s, ";")
 		c.removeEmpty()
 	default:
