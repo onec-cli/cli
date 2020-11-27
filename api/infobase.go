@@ -34,6 +34,19 @@ func (c *connectionString) Values() []string {
 	return c.values
 }
 
+func (c *connectionString) removeEmpty() {
+	if c.values == nil {
+		return
+	}
+	n := c.values[:0]
+	for _, v := range c.values {
+		if v != "" {
+			n = append(n, v)
+		}
+	}
+	c.values = n
+}
+
 func (c *connectionString) parse() error {
 	s := strings.Trim(c.connectionString, " ;")
 	switch {
@@ -43,19 +56,15 @@ func (c *connectionString) parse() error {
 		c.values = append(c.values, s)
 	case strings.HasPrefix(strings.ToUpper(s), "/S"):
 		s = s[2:]
-		if i := strings.LastIndex(s, "\\"); i > 0 {
-			c.values = append(c.values, "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " "))
-		} else {
+		i := strings.LastIndex(s, "\\")
+		if i < 0 {
 			return ErrInvalidConnectionString
 		}
+		srv, ref := "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " ")
+		c.values = append(c.values, srv, ref)
 	case strings.Contains(s, "File=") || strings.Contains(s, "Srvr="):
 		c.values = strings.Split(s, ";")
-		b := c.values[:0]
-		for _, x := range c.values {
-			if x != "" {
-				b = append(b, x)
-			}
-		}
+		c.removeEmpty()
 	default:
 		return ErrInvalidConnectionString
 	}

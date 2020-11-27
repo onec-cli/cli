@@ -138,12 +138,23 @@ func Test_connectionString_parse(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "params sep",
+			name: "end delimiter",
 			fields: fields{
 				connectionString: "File=./foo;",
 			},
 			want: []string{
 				`File=./foo`,
+			},
+			wantErr: false,
+		},
+		{
+			name: "missed param",
+			fields: fields{
+				connectionString: "File=./foo;;Local=ru",
+			},
+			want: []string{
+				`File=./foo`,
+				`Local=ru`,
 			},
 			wantErr: false,
 		},
