@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var ErrInvalidConnectionString = errors.New("invalid connection string format")
+
 func CreateInfobase(c string) (runner.Command, error) {
 	command := connectionString{connectionString: c}
 	err := command.parse()
@@ -33,18 +35,29 @@ func (c *connectionString) Values() []string {
 }
 
 func (c *connectionString) parse() error {
-
+	s := strings.Trim(c.connectionString, " ;")
 	switch {
-	case strings.HasPrefix(strings.ToUpper(c.connectionString), "/F"):
-		file := "File=" + strings.TrimPrefix(c.connectionString, "/F")
-		c.values = append(c.values, file)
-	case strings.Contains(c.connectionString, "File=") ||
-		strings.Contains(c.connectionString, "Srvr="):
-		c.values = strings.Split(c.connectionString, ";")
-		// TODO Надо почистить от пустых строк и артифактов
+	case strings.HasPrefix(strings.ToUpper(s), "/F"):
+		s = s[2:]
+		s = "File=" + strings.Trim(s, " ")
+		c.values = append(c.values, s)
+	case strings.HasPrefix(strings.ToUpper(s), "/S"):
+		s = s[2:]
+		if i := strings.LastIndex(s, "\\"); i > 0 {
+			c.values = append(c.values, "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " "))
+		} else {
+			return ErrInvalidConnectionString
+		}
+	case strings.Contains(s, "File=") || strings.Contains(s, "Srvr="):
+		c.values = strings.Split(s, ";")
+		b := c.values[:0]
+		for _, x := range c.values {
+			if x != "" {
+				b = append(b, x)
+			}
+		}
 	default:
-		return errors.New("invalid connection string format")
+		return ErrInvalidConnectionString
 	}
-
 	return nil
 }

@@ -133,17 +133,17 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: "/F./f_Фл_o",
 			},
 			want: []string{
-				"File=./f_Фл_o",
+				`File=./f_Фл_o`,
 			},
 			wantErr: false,
 		},
 		{
 			name: "params sep",
 			fields: fields{
-				connectionString: "/F./foo;",
+				connectionString: "File=./foo;",
 			},
 			want: []string{
-				"File=./foo",
+				`File=./foo`,
 			},
 			wantErr: false,
 		},
@@ -153,17 +153,17 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: "/F./foo",
 			},
 			want: []string{
-				"File=./foo",
+				`File=./foo`,
 			},
 			wantErr: false,
 		},
 		{
 			name: "/F spaces",
 			fields: fields{
-				connectionString: " /F. /foo ",
+				connectionString: " /F ./foo ",
 			},
 			want: []string{
-				"File=./foo",
+				`File=./foo`,
 			},
 			wantErr: false,
 		},
@@ -173,7 +173,7 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: "/f./foo",
 			},
 			want: []string{
-				"File=./foo",
+				`File=./foo`,
 			},
 			wantErr: false,
 		},
@@ -183,7 +183,7 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: `File=C:\foo\boo`,
 			},
 			want: []string{
-				`File="C:\foo\boo"`,
+				`File=C:\foo\boo`,
 			},
 			wantErr: false,
 		},
@@ -193,7 +193,7 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: "File=/foo/boo",
 			},
 			want: []string{
-				`File="C:\foo\boo"`,
+				`File=/foo/boo`,
 			},
 			wantErr: false,
 		},
@@ -229,8 +229,8 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: `/S127.0.0.1:1541\boo`,
 			},
 			want: []string{
-				`Srvr="127.0.0.1:1541"`,
-				`Ref="boo"`,
+				`Srvr=127.0.0.1:1541`,
+				`Ref=boo`,
 			},
 			wantErr: false,
 		},
@@ -240,8 +240,8 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: `/Stcp://foo:1641\boo`,
 			},
 			want: []string{
-				`Srvr="tcp://foo:1641"`,
-				`Ref="boo"`,
+				`Srvr=tcp://foo:1641`,
+				`Ref=boo`,
 			},
 			wantErr: false,
 		},
@@ -251,8 +251,8 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: `/S[fe10::c47b:90b7:fa32:a2fa%12]\boo`,
 			},
 			want: []string{
-				`Srvr="[fe10::c47b:90b7:fa32:a2fa%12]"`,
-				`Ref="boo"`,
+				`Srvr=[fe10::c47b:90b7:fa32:a2fa%12]`,
+				`Ref=boo`,
 			},
 			wantErr: false,
 		},
@@ -262,8 +262,8 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: `/S127.0.0.1:1541,127.0.0.2:1542\boo`,
 			},
 			want: []string{
-				`Srvr="127.0.0.1:1541,127.0.0.2:1542"`,
-				`Ref="boo"`,
+				`Srvr=127.0.0.1:1541,127.0.0.2:1542`,
+				`Ref=boo`,
 			},
 			wantErr: false,
 		},
@@ -274,7 +274,7 @@ func Test_connectionString_parse(t *testing.T) {
 			},
 			want: []string{
 				`Srvr="foo"`,
-				`Ref="boo"`,
+				`Ref=boo`,
 			},
 			wantErr: false,
 		},
