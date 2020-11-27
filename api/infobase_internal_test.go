@@ -285,8 +285,12 @@ func Test_connectionString_parse(t *testing.T) {
 				connectionString: tt.fields.connectionString,
 				values:           tt.fields.values,
 			}
-			if err := c.parse(); (err != nil) != tt.wantErr || !reflect.DeepEqual(c.values, tt.want) {
-				t.Errorf("parse() error = %v, want %v, wantErr %v", err, tt.want, tt.wantErr)
+			err := c.parse()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parse() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(c.values, tt.want) {
+				t.Errorf("parse() values = %v, want %v", c.values, tt.want)
 			}
 		})
 	}
