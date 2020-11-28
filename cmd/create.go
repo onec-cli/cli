@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"context"
-	"fmt"
+	"github.com/briandowns/spinner"
 	"github.com/onec-cli/cli/api"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	v8errors "github.com/v8platform/errors"
+	"github.com/v8platform/marshaler"
 	"github.com/v8platform/runner"
 	"log"
+	"reflect"
 	"time"
 )
 
@@ -33,6 +35,21 @@ to quickly create a Cobra application.`,
 		log.Println("Create infobase started")
 
 		//viper.GetString("user"), viper.GetString("password")
+		//viper.GetString("dbms")
+
+		//todo заполнить designer.CreateServerInfoBaseOptions (а точнее, создать свою структуру defOpt c v8
+		//заполнить ее деф значениями viper
+		opts := new(defaultOptions)
+		opts.bindViper()
+		marshal, err := marshaler.Marshal(opts)
+		log.Println(marshal, err)
+		//передать api.CreateInfobase
+		//там после command.parse() добавить значения из деф после маршалинга получив []string ключ=значение
+		//если подобного значения не было
+
+		spinner := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+		spinner.Start()
+
 		infobases := api.CreateInfobase(args)
 		for _, infobase := range infobases {
 			what, err := infobase.Command()
@@ -41,8 +58,7 @@ to quickly create a Cobra application.`,
 				continue
 			}
 			platformRunner := runner.NewPlatformRunner(nil, what)
-			// todo https://pkg.go.dev/github.com/briandowns/spinner?readme=expanded#section-readme
-			go spinner(100 * time.Millisecond)
+			//go spinner(100 * time.Millisecond)
 			err = platformRunner.Run(context.Background())
 			// todo много букв
 			if err != nil {
@@ -53,8 +69,11 @@ to quickly create a Cobra application.`,
 				}
 				log.Println(err)
 			}
+			spinner.Stop()
 			log.Printf("New infobase created: %v", platformRunner.Args())
+			spinner.Start()
 		}
+		spinner.Stop()
 	},
 }
 
@@ -68,21 +87,59 @@ func init() {
 
 	// Local flags which will only run when this command is called directly, e.g.:
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	createCmd.Flags().StringP("db-type", "", "PostgreSQL", "db server type")
 
 	// Viper bind
 	viper.BindPFlag("user", createCmd.PersistentFlags().Lookup("user"))
 	viper.BindPFlag("password", createCmd.PersistentFlags().Lookup("password"))
+	viper.BindPFlag("dbms", createCmd.Flags().Lookup("db-type"))
 
 	// Viper default
-	viper.SetDefault("user", "")
-	viper.SetDefault("password", "")
+
+	//viper.SetDefault("user", "")
+	//viper.SetDefault("password", "")
+	//viper.SetDefault("db-type", "PostgreSQL")
 }
 
-func spinner(delay time.Duration) {
-	for {
-		for _, r := range `-\|/` {
-			fmt.Printf("\r%c", r)
-			time.Sleep(delay)
-		}
+//func spinner(delay time.Duration) {
+//	for {
+//		for _, r := range `-\|/` {
+//			fmt.Printf("\r%c", r)
+//			time.Sleep(delay)
+//		}
+//	}
+//}
+
+type defaultOptions struct {
+	//тип используемого сервера баз данных:
+	// MSSQLServer — Microsoft SQL Server;
+	// PostgreSQL — PostgreSQL;
+	// IBMDB2 — IBM DB2;
+	// OracleDatabase — Oracle Database.
+	DBMS string `v8:"DBMS, equal_sep" json:"dbms"`
+
+	//имя сервера баз данных;
+	DBSrvr string `v8:"DBSrvr, equal_sep" json:"db_srvr"`
+
+	// имя базы данных в сервере баз данных;
+	DB string `v8:"DB, equal_sep" json:"db_ref"`
+
+	//имя пользователя сервера баз данных;
+	DBUID string `v8:"DBUID, equal_sep" json:"db_user"`
+
+	// создать базу данных в случае ее отсутствия ("Y"|"N".
+	// "Y" — создавать базу данных в случае отсутствия,
+	// "N" — не создавать. Значение по умолчанию — N).
+	//CrSQLDB bool `v8:"CrSQLDB, optional, equal_sep, bool_true=Y" json:"create_db"`
+}
+
+func (o *defaultOptions) bindViper() {
+
+	st := reflect.TypeOf(*o)
+	el := reflect.ValueOf(o).Elem()
+	for i := 0; i < st.NumField(); i++ {
+		field := st.Field(i)
+		v := viper.GetString(field.Name)
+		el.FieldByName(field.Name).SetString(v)
 	}
 }

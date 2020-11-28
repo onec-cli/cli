@@ -13,6 +13,9 @@ func CreateInfobase(s []string) []*infobase {
 	for _, c := range s {
 		command := &connectionString{connectionString: c}
 		err := command.parse()
+		if err == nil {
+			command.appendDefaultOptions()
+		}
 		r = append(r, newInfobase(command, err))
 	}
 	return r
@@ -31,9 +34,17 @@ func (i *infobase) Command() (runner.Command, error) {
 	return i.command, i.err
 }
 
+//type Kind int
+//
+//const (
+//	File Kind = iota
+//	Server
+//)
+
 type connectionString struct {
 	connectionString string
 	values           []string
+	//kind             Kind
 }
 
 func (c *connectionString) Command() string {
@@ -81,6 +92,12 @@ func (c *connectionString) parse() error {
 	c.values = append(c.values, values...)
 	c.removeEmpty()
 	return nil
+}
+
+func (c *connectionString) appendDefaultOptions() {
+	//	if c.kind == Server {
+	//designer.CreateServerInfoBaseOptions
+	//	}
 }
 
 func makeFileString(s string) []string {
