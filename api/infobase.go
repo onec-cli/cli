@@ -8,13 +8,27 @@ import (
 
 var errInvalidConnectionString = errors.New("invalid connection string format")
 
-func CreateInfobase(c string) (runner.Command, error) {
-	command := connectionString{connectionString: c}
-	err := command.parse()
-	if err != nil {
-		return nil, err
+func CreateInfobase(s []string) []*infobase {
+	var r []*infobase
+	for _, c := range s {
+		command := &connectionString{connectionString: c}
+		err := command.parse()
+		r = append(r, newInfobase(command, err))
 	}
-	return &command, nil
+	return r
+}
+
+type infobase struct {
+	command runner.Command
+	err     error
+}
+
+func newInfobase(command runner.Command, err error) *infobase {
+	return &infobase{command: command, err: err}
+}
+
+func (i *infobase) Command() (runner.Command, error) {
+	return i.command, i.err
 }
 
 type connectionString struct {

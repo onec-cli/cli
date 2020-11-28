@@ -19,7 +19,7 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create CONNECTION_STRING",
+	Use:   "create CONNECTION_STRING...",
 	Short: "Create new database",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -27,32 +27,34 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Args: cobra.ExactArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
 		log.Println("Create infobase started")
 
 		//viper.GetString("user"), viper.GetString("password")
-		what, err := api.CreateInfobase(args[0])
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		platformRunner := runner.NewPlatformRunner(nil, what)
-		// todo https://pkg.go.dev/github.com/briandowns/spinner?readme=expanded#section-readme
-		go spinner(100 * time.Millisecond)
-		err = platformRunner.Run(context.Background())
-		// todo чёт неудобно
-		if err != nil {
-			errorContext := v8errors.GetErrorContext(err)
-			out, ok := errorContext["message"]
-			if ok {
-				err = v8errors.Internal.Wrap(err, out)
+		infobases := api.CreateInfobase(args)
+		for _, infobase := range infobases {
+			what, err := infobase.Command()
+			if err != nil {
+				log.Println(err)
+				continue
 			}
-			log.Fatalln(err)
+			platformRunner := runner.NewPlatformRunner(nil, what)
+			// todo https://pkg.go.dev/github.com/briandowns/spinner?readme=expanded#section-readme
+			go spinner(100 * time.Millisecond)
+			err = platformRunner.Run(context.Background())
+			// todo много букв
+			if err != nil {
+				errorContext := v8errors.GetErrorContext(err)
+				out, ok := errorContext["message"]
+				if ok {
+					err = v8errors.Internal.Wrap(err, out)
+				}
+				log.Println(err)
+			}
+			log.Printf("New infobase created: %v", platformRunner.Args())
 		}
-
-		log.Printf("New infobase created: %v", platformRunner.Args())
 	},
 }
 
