@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var ErrInvalidConnectionString = errors.New("invalid connection string format")
+var errInvalidConnectionString = errors.New("invalid connection string format")
 
 func CreateInfobase(c string) (runner.Command, error) {
 	command := connectionString{connectionString: c}
@@ -58,7 +58,7 @@ func (c *connectionString) parse() error {
 		s = s[2:]
 		i := strings.LastIndex(s, "\\")
 		if i < 0 {
-			return ErrInvalidConnectionString
+			return errInvalidConnectionString
 		}
 		srv, ref := "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " ")
 		c.values = append(c.values, srv, ref)
@@ -67,7 +67,7 @@ func (c *connectionString) parse() error {
 		c.values = strings.Split(s, ";")
 		c.removeEmpty()
 	default:
-		return ErrInvalidConnectionString
+		return errInvalidConnectionString
 	}
 	return nil
 }

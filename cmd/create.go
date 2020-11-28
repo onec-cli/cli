@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"context"
+	"fmt"
 	"github.com/onec-cli/cli/api"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	v8errors "github.com/v8platform/errors"
 	"github.com/v8platform/runner"
 	"log"
+	"time"
 )
 
 //type createOptions struct {
@@ -30,16 +33,15 @@ to quickly create a Cobra application.`,
 		log.Println("Create infobase started")
 
 		//viper.GetString("user"), viper.GetString("password")
-		// todo https://github.com/v8platform/v8/issues/2
-
 		what, err := api.CreateInfobase(args[0])
-
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		err = runner.Run(nil, what)
-
+		platformRunner := runner.NewPlatformRunner(nil, what)
+		// todo https://pkg.go.dev/github.com/briandowns/spinner?readme=expanded#section-readme
+		go spinner(100 * time.Millisecond)
+		err = platformRunner.Run(context.Background())
 		// todo чёт неудобно
 		if err != nil {
 			errorContext := v8errors.GetErrorContext(err)
@@ -50,9 +52,7 @@ to quickly create a Cobra application.`,
 			log.Fatalln(err)
 		}
 
-		//	infobase := conn.Infobase()
-
-		//	log.Println("infobase created: " + infobase.ConnectionString())
+		log.Printf("New infobase created: %v", platformRunner.Args())
 	},
 }
 
@@ -74,4 +74,13 @@ func init() {
 	// Viper default
 	viper.SetDefault("user", "")
 	viper.SetDefault("password", "")
+}
+
+func spinner(delay time.Duration) {
+	for {
+		for _, r := range `-\|/` {
+			fmt.Printf("\r%c", r)
+			time.Sleep(delay)
+		}
+	}
 }

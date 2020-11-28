@@ -1,89 +1,39 @@
 package api
 
 import (
-	"github.com/v8platform/runner"
 	"reflect"
 	"testing"
 )
 
-//todo перенести во внешние тесты
-func TestCreateInfobase(t *testing.T) {
-	type args struct {
-		c string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    runner.Command
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateInfobase(tt.args.c)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CreateInfobase() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateInfobase() got = %v, want %v", got, tt.want)
-			}
-		})
+func Test_connectionString_Command(t *testing.T) {
+	c := &connectionString{}
+	want := "CREATEINFOBASE"
+	got := c.Command()
+	if got != want {
+		t.Errorf("Command() = %v, want %v", got, want)
 	}
 }
 
 func Test_connectionString_Check(t *testing.T) {
-	type fields struct {
-		connectionString string
-		values           []string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &connectionString{
-				connectionString: tt.fields.connectionString,
-				values:           tt.fields.values,
-			}
-			if err := c.Check(); (err != nil) != tt.wantErr {
-				t.Errorf("Check() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_connectionString_Command(t *testing.T) {
-	type fields struct {
-		connectionString string
-		values           []string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &connectionString{
-				connectionString: tt.fields.connectionString,
-				values:           tt.fields.values,
-			}
-			if got := c.Command(); got != tt.want {
-				t.Errorf("Command() = %v, want %v", got, tt.want)
-			}
-		})
+	c := &connectionString{}
+	got := c.Check()
+	if got != nil {
+		t.Errorf("Command() = %v, want %v", got, nil)
 	}
 }
 
 func Test_connectionString_Values(t *testing.T) {
+	c := &connectionString{
+		values: []string{"param1", "param2"},
+	}
+	want := []string{"param1", "param2"}
+	got := c.Values()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Command() = %v, want %v", got, want)
+	}
+}
+
+func Test_connectionString_removeEmpty(t *testing.T) {
 	type fields struct {
 		connectionString string
 		values           []string
@@ -93,16 +43,38 @@ func Test_connectionString_Values(t *testing.T) {
 		fields fields
 		want   []string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "not init",
+			fields: fields{
+				values: nil,
+			},
+			want: nil,
+		},
+		{
+			name: "have empty",
+			fields: fields{
+				values: []string{
+					"",
+					"param1",
+					"",
+					"param2",
+					"",
+				},
+			},
+			want: []string{
+				"param1",
+				"param2",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &connectionString{
-				connectionString: tt.fields.connectionString,
-				values:           tt.fields.values,
+				values: tt.fields.values,
 			}
-			if got := c.Values(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Values() = %v, want %v", got, tt.want)
+			c.removeEmpty()
+			if !reflect.DeepEqual(c.values, tt.want) {
+				t.Errorf("removeEmpty() values = %v, want %v", c.values, tt.want)
 			}
 		})
 	}
