@@ -62,26 +62,41 @@ func (c *connectionString) removeEmpty() {
 }
 
 func (c *connectionString) parse() error {
+	var values []string
 	s := strings.Trim(c.connectionString, " ;")
 	switch {
 	case strings.HasPrefix(strings.ToUpper(s), "/F"):
-		s = s[2:]
-		s = "File=" + strings.Trim(s, " ")
-		c.values = append(c.values, s)
+		values = makeFileString(s)
 	case strings.HasPrefix(strings.ToUpper(s), "/S"):
-		s = s[2:]
-		i := strings.LastIndex(s, "\\")
-		if i < 0 {
+		values = makeServerStrings(s)
+		if values == nil {
 			return errInvalidConnectionString
 		}
-		srv, ref := "Srvr="+strings.Trim(s[:i], " "), "Ref="+strings.Trim(s[i+1:], " ")
-		c.values = append(c.values, srv, ref)
 	case strings.Contains(strings.ToUpper(s), "FILE=") ||
 		strings.Contains(strings.ToUpper(s), "SRVR="):
-		c.values = strings.Split(s, ";")
-		c.removeEmpty()
+		values = strings.Split(s, ";")
 	default:
 		return errInvalidConnectionString
 	}
+	c.values = append(c.values, values...)
+	c.removeEmpty()
 	return nil
+}
+
+func makeFileString(s string) []string {
+	var r []string
+	s = s[2:]
+	return append(r, "File="+strings.Trim(s, " "))
+}
+
+func makeServerStrings(s string) []string {
+	var r []string
+	s = s[2:]
+	params := strings.Split(s, "\\")
+	if len(params) != 2 {
+		return nil
+	}
+	srvr := "Srvr=" + strings.Trim(params[0], " ")
+	ref := "Ref=" + strings.Trim(params[1], " ")
+	return append(r, srvr, ref)
 }
