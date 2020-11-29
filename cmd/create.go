@@ -50,7 +50,7 @@ to quickly create a Cobra application.`,
 		spinner := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 		spinner.Start()
 
-		infobases := api.CreateInfobase(args)
+		infobases := api.CreateInfobase(args, marshal...)
 		for _, infobase := range infobases {
 			what, err := infobase.Command()
 			if err != nil {
@@ -87,12 +87,26 @@ func init() {
 
 	// Local flags which will only run when this command is called directly, e.g.:
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	//todo если нет shorthand то заменить на Flags().String
 	createCmd.Flags().StringP("db-type", "", "PostgreSQL", "db server type")
+	createCmd.Flags().StringP("db-server", "", "db", "db server") // todo заменить на localhost
+	createCmd.Flags().StringP("db", "", "ib", "db name")
+	createCmd.Flags().StringP("db-user", "", "postgres", "db user")
+	createCmd.Flags().BoolP("db-create", "", true, "create db")
+
+	createCmd.Flags().String("claster-user", "", "claster user") // todo для теста дефолтных, эксперимент
 
 	// Viper bind
-	viper.BindPFlag("user", createCmd.PersistentFlags().Lookup("user"))
-	viper.BindPFlag("password", createCmd.PersistentFlags().Lookup("password"))
+	viper.BindPFlag("usr", createCmd.PersistentFlags().Lookup("user"))
+	viper.BindPFlag("pwd", createCmd.PersistentFlags().Lookup("password"))
 	viper.BindPFlag("dbms", createCmd.Flags().Lookup("db-type"))
+	viper.BindPFlag("dbsrvr", createCmd.Flags().Lookup("db-server"))
+	viper.BindPFlag("db", createCmd.Flags().Lookup("db"))
+	viper.BindPFlag("dbuid", createCmd.Flags().Lookup("db-user"))
+	viper.BindPFlag("crsqldb", createCmd.Flags().Lookup("db-create"))
+
+	viper.BindPFlag("tester", createCmd.Flags().Lookup("claster-user"))
 
 	// Viper default
 
@@ -130,7 +144,7 @@ type defaultOptions struct {
 	// создать базу данных в случае ее отсутствия ("Y"|"N".
 	// "Y" — создавать базу данных в случае отсутствия,
 	// "N" — не создавать. Значение по умолчанию — N).
-	//CrSQLDB bool `v8:"CrSQLDB, optional, equal_sep, bool_true=Y" json:"create_db"`
+	CrSQLDB bool `v8:"CrSQLDB, optional, equal_sep, bool_true=Y" json:"create_db"`
 }
 
 func (o *defaultOptions) bindViper() {
@@ -140,6 +154,12 @@ func (o *defaultOptions) bindViper() {
 	for i := 0; i < st.NumField(); i++ {
 		field := st.Field(i)
 		v := viper.GetString(field.Name)
-		el.FieldByName(field.Name).SetString(v)
+		f := el.FieldByName(field.Name)
+		switch f.Interface().(type) {
+		case string:
+			f.SetString(v)
+		case bool:
+			f.SetBool(v == "true")
+		}
 	}
 }

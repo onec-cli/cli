@@ -8,13 +8,13 @@ import (
 
 var errInvalidConnectionString = errors.New("invalid connection string format")
 
-func CreateInfobase(s []string) []*infobase {
+func CreateInfobase(s []string, opts ...string) []*infobase {
 	var r []*infobase
 	for _, c := range s {
 		command := &connectionString{connectionString: c}
 		err := command.parse()
 		if err == nil {
-			command.appendDefaultOptions()
+			command.appendDefaultOptions(opts)
 		}
 		r = append(r, newInfobase(command, err))
 	}
@@ -34,17 +34,17 @@ func (i *infobase) Command() (runner.Command, error) {
 	return i.command, i.err
 }
 
-//type Kind int
-//
-//const (
-//	File Kind = iota
-//	Server
-//)
+type connType int
+
+const (
+	File connType = iota
+	ClientServer
+)
 
 type connectionString struct {
 	connectionString string
 	values           []string
-	//kind             Kind
+	connType         connType
 }
 
 func (c *connectionString) Command() string {
@@ -79,12 +79,14 @@ func (c *connectionString) parse() error {
 	case strings.HasPrefix(strings.ToUpper(s), "/F"):
 		values = makeFileString(s)
 	case strings.HasPrefix(strings.ToUpper(s), "/S"):
+		c.connType = ClientServer
 		values = makeServerStrings(s)
 		if values == nil {
 			return errInvalidConnectionString
 		}
 	case strings.Contains(strings.ToUpper(s), "FILE=") ||
 		strings.Contains(strings.ToUpper(s), "SRVR="):
+		c.connType = ClientServer
 		values = strings.Split(s, ";")
 	default:
 		return errInvalidConnectionString
@@ -94,10 +96,17 @@ func (c *connectionString) parse() error {
 	return nil
 }
 
-func (c *connectionString) appendDefaultOptions() {
-	//	if c.kind == Server {
-	//designer.CreateServerInfoBaseOptions
-	//	}
+func (c *connectionString) appendDefaultOptions(opts []string) {
+	if c.connType != ClientServer {
+		return
+	}
+	//designer.CreateServerInfoBaseOptions }
+	for _, s := range opts {
+		//if s, ok := o.(string); ok {
+		//todo добавить проверку что такой параметр уже есть
+		c.values = append(c.values, s)
+		//}
+	}
 }
 
 func makeFileString(s string) []string {
