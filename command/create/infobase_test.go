@@ -1,4 +1,4 @@
-package api_test
+package create_test
 
 //func TestCreateInfobase(t *testing.T) {
 //	type args struct {

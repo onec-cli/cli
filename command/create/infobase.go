@@ -1,4 +1,4 @@
-package api
+package create
 
 import (
 	"errors"
@@ -7,6 +7,7 @@ import (
 )
 
 var errInvalidConnectionString = errors.New("invalid connection string format")
+var errUnsupportedDefaultOptionType = errors.New("unsupported type in default options")
 
 func CreateInfobase(s []string, opts ...string) []*infobase {
 	var r []*infobase
