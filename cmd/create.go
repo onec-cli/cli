@@ -17,7 +17,7 @@ var sp = spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create CONNECTION_STRING...",
-	Short: "Create new database",
+	Short: "Create new infobase",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -25,8 +25,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Args: cobra.MinimumNArgs(1),
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return runCreate(args)
+	Run: func(cmd *cobra.Command, args []string) {
+		runCreate(args)
 	},
 }
 
@@ -48,8 +48,6 @@ func init() {
 	createCmd.Flags().StringP("db-user", "", "postgres", "db user")
 	createCmd.Flags().BoolP("db-create", "", true, "create db")
 
-	createCmd.Flags().String("claster-user", "", "claster user") // todo для теста дефолтных, эксперимент
-
 	// Viper bind
 	viper.BindPFlag("usr", createCmd.PersistentFlags().Lookup("user"))
 	viper.BindPFlag("pwd", createCmd.PersistentFlags().Lookup("password"))
@@ -59,8 +57,6 @@ func init() {
 	viper.BindPFlag("dbuid", createCmd.Flags().Lookup("db-user"))
 	viper.BindPFlag("crsqldb", createCmd.Flags().Lookup("db-create"))
 
-	viper.BindPFlag("tester", createCmd.Flags().Lookup("claster-user"))
-
 	// Viper default
 
 	//viper.SetDefault("user", "")
@@ -68,45 +64,48 @@ func init() {
 	//viper.SetDefault("db-type", "PostgreSQL")
 }
 
-func runCreate(args []string) error {
+func runCreate(args []string) {
 
-	log.Println("Create infobase started")
-
-	//todo заполнить designer.CreateServerInfoBaseOptions (а точнее, создать свою структуру defOpt c v8
-	//заполнить ее деф значениями viper
-	options, err := create.DefaultOptions(viper.AllSettings())
-	if err != nil {
-		return err
-	}
-	//передать api.CreateInfobase
-	//там после command.parse() добавить значения из деф после маршалинга получив []string ключ=значение
-	//если подобного значения не было
+	log.Println("Creation infobase started:")
 
 	sp.Start()
 
-	infobases := create.CreateInfobase(args, options...)
-	for _, infobase := range infobases {
+	options, err := create.DefaultOptions(viper.AllSettings())
+	if err != nil {
+		return
+	}
+
+	infobases := create.NewInfobases(args, options...)
+
+	for i, infobase := range infobases {
+
+		log.Printf("infobase #%d\n", i+1)
+
 		what, err := infobase.Command()
 		if err != nil {
-			log.Println(err)
+			log.Println("error: ", err)
 			continue
 		}
+
 		platformRunner := runner.NewPlatformRunner(nil, what)
+		sp.Stop()
+		log.Printf("=> %v\n", platformRunner.Args())
+		sp.Start()
 		err = platformRunner.Run(context.Background())
-		// todo много букв
+
+		sp.Stop()
 		if err != nil {
+			// todo много букв
 			errorContext := v8errors.GetErrorContext(err)
 			out, ok := errorContext["message"]
 			if ok {
 				err = v8errors.Internal.Wrap(err, out)
 			}
-			log.Println(err)
+			log.Println("error: ", err)
+		} else {
+			log.Println("infobase created")
 		}
-		sp.Stop()
-		log.Printf("New infobase created: %v", platformRunner.Args())
 		sp.Start()
 	}
 	sp.Stop()
-
-	return nil
 }

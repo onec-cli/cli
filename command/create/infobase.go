@@ -8,9 +8,9 @@ import (
 
 var errInvalidConnectionString = errors.New("invalid connection string format")
 
-func CreateInfobase(s []string, opts ...string) []*infobase {
+func NewInfobases(ib []string, opts ...string) []*infobase {
 	var r []*infobase
-	for _, c := range s {
+	for _, c := range ib {
 		command := &connectionString{connectionString: c}
 		err := command.parse()
 		if err == nil {
@@ -77,7 +77,7 @@ func (c *connectionString) parse() error {
 	s := strings.Trim(c.connectionString, " ;")
 	switch {
 	case strings.HasPrefix(strings.ToUpper(s), "/F"):
-		values = makeFileString(s)
+		values = makeFileStrings(s)
 	case strings.HasPrefix(strings.ToUpper(s), "/S"):
 		c.connType = ClientServer
 		values = makeServerStrings(s)
@@ -113,7 +113,7 @@ exit:
 	}
 }
 
-func makeFileString(s string) []string {
+func makeFileStrings(s string) []string {
 	var r []string
 	s = s[2:]
 	return append(r, "File="+strings.Trim(s, " "))

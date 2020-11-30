@@ -14,13 +14,13 @@ package create_test
 //	}
 //	for _, tt := range tests {
 //		t.Run(tt.name, func(t *testing.T) {
-//			got, err := api.CreateInfobase(tt.args.c)
+//			got, err := api.NewInfobases(tt.args.c)
 //			if (err != nil) != tt.wantErr {
-//				t.Errorf("CreateInfobase() error = %v, wantErr %v", err, tt.wantErr)
+//				t.Errorf("NewInfobases() error = %v, wantErr %v", err, tt.wantErr)
 //				return
 //			}
 //			if !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("CreateInfobase() got = %v, want %v", got, tt.want)
+//				t.Errorf("NewInfobases() got = %v, want %v", got, tt.want)
 //			}
 //		})
 //	}
