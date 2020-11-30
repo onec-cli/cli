@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+var sp = spinner.New(spinner.CharSets[14], 100*time.Millisecond)
+
 // createCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create CONNECTION_STRING...",
@@ -72,15 +74,15 @@ func runCreate(args []string) error {
 
 	//todo заполнить designer.CreateServerInfoBaseOptions (а точнее, создать свою структуру defOpt c v8
 	//заполнить ее деф значениями viper
-	options, err := create.GetDefaultOptions(viper.AllSettings())
-
-	log.Println(options, err)
+	options, err := create.DefaultOptions(viper.AllSettings())
+	if err != nil {
+		return err
+	}
 	//передать api.CreateInfobase
 	//там после command.parse() добавить значения из деф после маршалинга получив []string ключ=значение
 	//если подобного значения не было
 
-	spinner := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
-	spinner.Start()
+	sp.Start()
 
 	infobases := create.CreateInfobase(args, options...)
 	for _, infobase := range infobases {
@@ -90,7 +92,6 @@ func runCreate(args []string) error {
 			continue
 		}
 		platformRunner := runner.NewPlatformRunner(nil, what)
-		//go spinner(100 * time.Millisecond)
 		err = platformRunner.Run(context.Background())
 		// todo много букв
 		if err != nil {
@@ -101,11 +102,11 @@ func runCreate(args []string) error {
 			}
 			log.Println(err)
 		}
-		spinner.Stop()
+		sp.Stop()
 		log.Printf("New infobase created: %v", platformRunner.Args())
-		spinner.Start()
+		sp.Start()
 	}
-	spinner.Stop()
+	sp.Stop()
 
 	return nil
 }

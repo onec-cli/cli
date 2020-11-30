@@ -7,7 +7,6 @@ import (
 )
 
 var errInvalidConnectionString = errors.New("invalid connection string format")
-var errUnsupportedDefaultOptionType = errors.New("unsupported type in default options")
 
 func CreateInfobase(s []string, opts ...string) []*infobase {
 	var r []*infobase
@@ -15,7 +14,7 @@ func CreateInfobase(s []string, opts ...string) []*infobase {
 		command := &connectionString{connectionString: c}
 		err := command.parse()
 		if err == nil {
-			command.appendDefaultOptions(opts)
+			command.defaultOptions(opts)
 		}
 		r = append(r, newInfobase(command, err))
 	}
@@ -85,8 +84,9 @@ func (c *connectionString) parse() error {
 		if values == nil {
 			return errInvalidConnectionString
 		}
-	case strings.Contains(strings.ToUpper(s), "FILE=") ||
-		strings.Contains(strings.ToUpper(s), "SRVR="):
+	case strings.Contains(strings.ToUpper(s), "FILE="):
+		values = strings.Split(s, ";")
+	case strings.Contains(strings.ToUpper(s), "SRVR="):
 		c.connType = ClientServer
 		values = strings.Split(s, ";")
 	default:
@@ -97,16 +97,19 @@ func (c *connectionString) parse() error {
 	return nil
 }
 
-func (c *connectionString) appendDefaultOptions(opts []string) {
+func (c *connectionString) defaultOptions(opts []string) {
 	if c.connType != ClientServer {
 		return
 	}
-	//designer.CreateServerInfoBaseOptions }
+exit:
 	for _, s := range opts {
-		//if s, ok := o.(string); ok {
-		//todo добавить проверку что такой параметр уже есть
+		params := strings.SplitAfter(s, "=")
+		for _, value := range c.values {
+			if strings.HasPrefix(value, params[0]) {
+				continue exit
+			}
+		}
 		c.values = append(c.values, s)
-		//}
 	}
 }
 

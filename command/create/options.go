@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+func DefaultOptions(opts map[string]interface{}) ([]string, error) {
+	defOpts := newDefaultOptions()
+	defOpts.bind(opts)
+	return marshaler.Marshal(defOpts)
+}
+
 type defaultOptions struct {
 	//тип используемого сервера баз данных:
 	// MSSQLServer — Microsoft SQL Server;
@@ -49,10 +55,4 @@ func (o *defaultOptions) bind(opts map[string]interface{}) {
 			target.SetBool(cast.ToBool(new))
 		}
 	}
-}
-
-func GetDefaultOptions(opts map[string]interface{}) ([]string, error) {
-	defOpts := newDefaultOptions()
-	defOpts.bind(opts)
-	return marshaler.Marshal(defOpts)
 }
