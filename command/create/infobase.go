@@ -126,7 +126,7 @@ func makeServerStrings(s string) []string {
 	if len(params) != 2 {
 		return nil
 	}
-	srvr := "Srvr=" + strings.Trim(params[0], " ")
-	ref := "Ref=" + strings.Trim(params[1], " ")
+	srvr := "Srvr=" + strings.TrimSpace(params[0])
+	ref := "Ref=" + strings.TrimSpace(params[1])
 	return append(r, srvr, ref)
 }

@@ -48,9 +48,12 @@ func init() {
 	createCmd.Flags().StringP("db-user", "", "postgres", "db user")
 	createCmd.Flags().BoolP("db-create", "", true, "create db")
 
+	createCmd.Flags().StringP("server", "", "", "server")
+
 	// Viper bind
 	viper.BindPFlag("usr", createCmd.PersistentFlags().Lookup("user"))
 	viper.BindPFlag("pwd", createCmd.PersistentFlags().Lookup("password"))
+
 	viper.BindPFlag("dbms", createCmd.Flags().Lookup("db-type"))
 	viper.BindPFlag("dbsrvr", createCmd.Flags().Lookup("db-server"))
 	viper.BindPFlag("db", createCmd.Flags().Lookup("db"))
