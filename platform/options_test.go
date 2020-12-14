@@ -1,7 +1,7 @@
-package create_test
+package platform_test
 
 import (
-	"github.com/onec-cli/cli/command/create"
+	"github.com/onec-cli/cli/platform"
 	"reflect"
 	"testing"
 )
@@ -41,7 +41,7 @@ func TestGetDefaultOptions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := create.DefaultOptions(tt.args.opts)
+			got, err := platform.DefaultOptions(tt.args.opts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DefaultOptions() error = %v, wantErr %v", err, tt.wantErr)
 				return

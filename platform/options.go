@@ -1,4 +1,4 @@
-package create
+package platform
 
 import (
 	"github.com/spf13/cast"

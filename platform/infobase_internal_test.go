@@ -1,4 +1,4 @@
-package create
+package platform
 
 import (
 	"reflect"

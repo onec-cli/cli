@@ -18,6 +18,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/onec-cli/cli/cmd/config"
+	"github.com/onec-cli/cli/cmd/platform"
 	"github.com/spf13/cobra"
 	"os"
 
@@ -55,6 +57,10 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+
+	// add all commands by category to the root command
+	rootCmd.AddCommand(platform.NewPlatformCommand())
+	rootCmd.AddCommand(config.NewConfigCommand())
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
