@@ -1,0 +1,10 @@
+"C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "File=./build/test1c" /out ./build/out1.txt
+err "C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE /F./build/test2c /out ./build/out2.txt
+err "C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "Srvr=srv;Ref=test1" /out ./build/out3.txt
+если на сервере бд есть пустая база:
+"C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "Srvr=srv;Ref=test1;DBMS=PostgreSQL;DBSrvr=db;DB=test1;DBUID=postgres;" /out ./build/out4.txt
+создание с генерацие бд:
+"C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "Srvr=srv;Ref=test1;DBMS=PostgreSQL;DBSrvr=db;DB=test1;DBUID=postgres;CrSQLDB=Y" /out ./build/out5.txt
+"C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "Srvr="srv";Ref="test1";DBMS=PostgreSQL;DBSrvr=db;DB=test1;DBUID=postgres;CrSQLDB=Y" /out ./build/out5.txt
+"C:\Program Files\1cv8\8.3.17.1549\bin\1cv8.exe" CREATEINFOBASE "Srvr="srv,srv:1541";Ref="test1";DBMS=PostgreSQL;DBSrvr=db;DB=test1;DBUID=postgres;CrSQLDB=Y" /out ./build/out5.txt
+
