@@ -2,14 +2,13 @@ package platform
 
 import (
 	"context"
-	"github.com/briandowns/spinner"
+	. "github.com/onec-cli/cli/cmd/spinner"
 	"github.com/onec-cli/cli/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	v8errors "github.com/v8platform/errors"
 	"github.com/v8platform/runner"
 	"log"
-	"time"
 )
 
 // NewCreateCommand creates a new cobra.Command for `cli platform create`
@@ -63,13 +62,11 @@ to quickly create a Cobra application.`,
 	return cmd
 }
 
-var sp = spinner.New(spinner.CharSets[14], 100*time.Millisecond)
-
 func runCreate(args []string) {
 
 	log.Println("Creation infobase started:")
 
-	sp.Start()
+	Spinner.Start()
 
 	options, err := platform.DefaultOptions(viper.AllSettings())
 	if err != nil {
@@ -89,12 +86,12 @@ func runCreate(args []string) {
 		}
 
 		platformRunner := runner.NewPlatformRunner(nil, what)
-		sp.Stop()
+		Spinner.Stop()
 		log.Printf("=> %v\n", platformRunner.Args())
-		sp.Start()
+		Spinner.Start()
 		err = platformRunner.Run(context.Background())
 
-		sp.Stop()
+		Spinner.Stop()
 		if err != nil {
 			// todo много букв
 			errorContext := v8errors.GetErrorContext(err)
@@ -106,7 +103,7 @@ func runCreate(args []string) {
 		} else {
 			log.Println("infobase created")
 		}
-		sp.Start()
+		Spinner.Start()
 	}
-	sp.Stop()
+	Spinner.Stop()
 }
