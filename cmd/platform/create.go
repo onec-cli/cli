@@ -37,11 +37,16 @@ to quickly create a Cobra application.`,
 	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	//todo если нет shorthand то заменить на Flags().String
+	// db
 	cmd.Flags().StringP("db-type", "", "PostgreSQL", "db server type")
 	cmd.Flags().StringP("db-server", "", "db", "db server") // todo заменить на localhost
 	cmd.Flags().StringP("db", "", "ib", "db name")
 	cmd.Flags().StringP("db-user", "", "postgres", "db user")
 	cmd.Flags().BoolP("db-create", "", true, "create db")
+
+	// common
+	cmd.Flags().StringP("out", "o", "", "out file")
+	cmd.Flags().BoolP("out-trunc", "", true, "truncate out file")
 
 	// Viper bind
 	viper.BindPFlag("usr", cmd.PersistentFlags().Lookup("user"))
@@ -52,6 +57,9 @@ to quickly create a Cobra application.`,
 	viper.BindPFlag("db", cmd.Flags().Lookup("db"))
 	viper.BindPFlag("dbuid", cmd.Flags().Lookup("db-user"))
 	viper.BindPFlag("crsqldb", cmd.Flags().Lookup("db-create"))
+
+	viper.BindPFlag("out", cmd.Flags().Lookup("out"))
+	viper.BindPFlag("out-trunc", cmd.Flags().Lookup("out-trunc"))
 
 	// Viper default
 
@@ -68,12 +76,13 @@ func runCreate(args []string) {
 
 	Spinner.Start()
 
-	options, err := platform.DefaultOptions(viper.AllSettings())
+	// todo DefaultOptions to def conn str
+	defaultOptions, err := platform.DefaultOptions(viper.AllSettings())
 	if err != nil {
 		return
 	}
 
-	infobases := platform.NewInfobases(args, options...)
+	infobases := platform.NewInfobases(args, defaultOptions...)
 
 	for i, infobase := range infobases {
 
@@ -85,7 +94,9 @@ func runCreate(args []string) {
 			continue
 		}
 
-		platformRunner := runner.NewPlatformRunner(nil, what)
+		opts := options()
+		platformRunner := runner.NewPlatformRunner(nil, what, opts)
+
 		Spinner.Stop()
 		log.Printf("=> %v\n", platformRunner.Args())
 		Spinner.Start()
@@ -106,4 +117,18 @@ func runCreate(args []string) {
 		Spinner.Start()
 	}
 	Spinner.Stop()
+}
+
+func options() []runner.Option {
+
+	out := viper.GetString("out")
+	if out == "" {
+		return nil
+	}
+	t := viper.GetBool("out-trunc")
+
+	var o []runner.Option
+	o = append(o, runner.WithOut(out, t))
+
+	return o
 }
