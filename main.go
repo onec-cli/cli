@@ -16,8 +16,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 package main
 
-import "github.com/onec-cli/cli/cmd"
+import (
+	"fmt"
+	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/cmd"
+	"os"
+)
 
 func main() {
-	cmd.Execute()
+
+	cli := cli.NewCli()
+	command := cmd.NewRootCommand(cli)
+	if err := command.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	//command.Execute()
 }
