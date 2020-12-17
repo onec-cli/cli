@@ -1,12 +1,12 @@
 package platform
 
 import (
-	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/client"
 	"github.com/spf13/cobra"
 )
 
 // NewPlatformCommand returns a cobra command for `platform` subcommands
-func NewPlatformCommand(cli cli.Cli) *cobra.Command {
+func NewPlatformCommand(c client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "platform",
 		Aliases: []string{"p"},
@@ -22,8 +22,8 @@ to quickly create a Cobra application.`,
 		//},
 	}
 	cmd.AddCommand(
-		NewCreateCommand(cli),
-		NewRunCommand(cli),
+		NewCreateCommand(c),
+		NewRunCommand(c),
 	)
 	return cmd
 }

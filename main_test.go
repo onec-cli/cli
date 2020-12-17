@@ -2,7 +2,7 @@ package main_test
 
 import (
 	"bytes"
-	"github.com/onec-cli/cli/cli/build"
+	"github.com/onec-cli/cli/client/build"
 	"github.com/onec-cli/cli/internal/test"
 	"io"
 	"io/ioutil"
@@ -23,10 +23,10 @@ func runCliCommand(t *testing.T, r io.ReadCloser, w io.Writer, args ...string) e
 	if w == nil {
 		w = ioutil.Discard
 	}
-	in := func(cli *test.FakeCli) {
+	in := func(cli *test.FakeClient) {
 		cli.SetIn(r)
 	}
-	combined := func(cli *test.FakeCli) {
+	combined := func(cli *test.FakeClient) {
 		cli.SetOut(w)
 		cli.SetErr(w)
 
@@ -53,5 +53,5 @@ func TestVersion(t *testing.T) {
 	var b bytes.Buffer
 	err := runCliCommand(t, nil, &b, "--version")
 	assert.NilError(t, err)
-	assert.Check(t, is.Contains(b.String(), build.APP_NAME+" version unknown, build unknown, time unknown"))
+	assert.Check(t, is.Contains(b.String(), build.AppName+" version unknown, build unknown, time unknown"))
 }

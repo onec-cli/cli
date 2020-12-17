@@ -18,15 +18,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/client"
 	"github.com/onec-cli/cli/cmd"
 	"os"
 )
 
 func main() {
-	cli := cli.NewCli()
-	if err := cmd.NewRootCommand(cli).Execute(); err != nil {
-		fmt.Fprintln(cli.Err(), "Error:", err) //todo magic words
+	c := client.NewClient()
+	if err := cmd.NewRootCommand(c).Execute(); err != nil {
+		fmt.Fprintln(c.Err(), client.ErrorPrefix, err)
 		os.Exit(1)
 	}
 }

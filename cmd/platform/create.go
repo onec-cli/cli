@@ -2,8 +2,8 @@ package platform
 
 import (
 	"context"
-	"github.com/onec-cli/cli/cli"
-	. "github.com/onec-cli/cli/cli/spinner"
+	"github.com/onec-cli/cli/client"
+	. "github.com/onec-cli/cli/client/spinner"
 	"github.com/onec-cli/cli/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,8 +12,8 @@ import (
 	"log"
 )
 
-// NewCreateCommand creates a new cobra.Command for `cli platform create`
-func NewCreateCommand(_ cli.Cli) *cobra.Command {
+// NewCreateCommand creates a new cobra.Command for `cli platform create` //todo cli rename
+func NewCreateCommand(_ client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create CONNECTION_STRING...",
 		Aliases: []string{"c"},

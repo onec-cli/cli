@@ -18,8 +18,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/onec-cli/cli/cli"
-	"github.com/onec-cli/cli/cli/build"
+	"github.com/onec-cli/cli/client"
+	"github.com/onec-cli/cli/client/build"
 	"github.com/onec-cli/cli/cmd/config"
 	"github.com/onec-cli/cli/cmd/platform"
 	"github.com/spf13/cobra"
@@ -31,10 +31,10 @@ import (
 
 var cfgFile string
 
-func NewRootCommand(cli cli.Cli) *cobra.Command {
+func NewRootCommand(c client.Client) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   build.APP_NAME,
+		Use:   build.AppName,
 		Short: "A brief description of your application",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -58,15 +58,15 @@ to quickly create a Cobra application.`,
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	cmd.SetOut(cli.Out())
+	cmd.SetOut(c.Out())
 
-	AddCommands(cli, cmd)
+	AddCommands(c, cmd)
 
 	return cmd
 }
 
 // AddCommands adds all the commands from ./cmd to the root command
-func AddCommands(cli cli.Cli, cmd *cobra.Command) {
+func AddCommands(cli client.Client, cmd *cobra.Command) {
 	cmd.AddCommand(platform.NewPlatformCommand(cli))
 	cmd.AddCommand(config.NewConfigCommand(cli))
 }
@@ -86,13 +86,13 @@ func initConfig() {
 
 		// Search config in home directory with name ".cli" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName("." + build.APP_NAME)
+		viper.SetConfigName("." + build.AppName)
 		viper.SetConfigType("json")
 
 		//viper.WriteConfigAs(filepath.Join(home, ".cli.json"))//todo test
 	}
 
-	viper.SetEnvPrefix(build.APP_NAME)
+	viper.SetEnvPrefix(build.AppName)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

@@ -1,6 +1,6 @@
 package build
 
-const APP_NAME = "onec"
+const AppName = "onec"
 
 // Default build-time variable.
 // These values are overridden via go build --ldflags

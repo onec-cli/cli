@@ -18,12 +18,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/client"
 	"github.com/spf13/cobra"
 )
 
 // NewConfigCommand returns a cobra command for `config` subcommands
-func NewConfigCommand(_ cli.Cli) *cobra.Command {
+func NewConfigCommand(_ client.Client) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "A brief description of your command",
