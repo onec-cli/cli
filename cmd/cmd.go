@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/cli/build"
 	"github.com/onec-cli/cli/cmd/config"
 	"github.com/onec-cli/cli/cmd/platform"
 	"github.com/spf13/cobra"
@@ -32,7 +33,7 @@ const APP_NAME = "onec" // todo temp
 
 var cfgFile string
 
-func NewRootCommand(_ *cli.Cli) *cobra.Command {
+func NewRootCommand(cli cli.Cli) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "cli",
@@ -43,29 +44,29 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-		// Uncomment the following line if your bare application
-		// has an action associated with it:
-		//	Run: func(cmd *cobra.Command, args []string) { },
+		SilenceErrors: true,
+		Version:       fmt.Sprintf("%s, build %s, time %s", build.Version, build.GitCommit, build.Time),
 	}
 
 	cobra.OnInitialize(initConfig)
 
-	// add all commands by category to the root command
-	cmd.AddCommand(platform.NewPlatformCommand())
-	cmd.AddCommand(config.NewConfigCommand())
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
+	//cmd.Flags().BoolP("version", "v", false, "Print version information and quit")
 	cmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	return cmd
+	cmd.SetOut(cli.Out())
+	//commands.AddCommands(cmd, cli)
+	// add all commands by category to the root command
+	cmd.AddCommand(platform.NewPlatformCommand()) //todo пробросить cli
+	cmd.AddCommand(config.NewConfigCommand())
 
+	return cmd
 }
 
 // initConfig reads in config file and ENV variables if set.
