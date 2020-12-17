@@ -17,13 +17,13 @@ var discard = ioutil.NopCloser(bytes.NewBuffer(nil))
 
 // todo вынести в internal/test
 type FakeCli struct {
-	in  io.Reader
+	in  io.ReadCloser
 	out io.Writer
 	err io.Writer
 }
 
 // In returns the input stream the cli will use
-func (c *FakeCli) In() io.Reader {
+func (c *FakeCli) In() io.ReadCloser {
 	return c.in
 }
 
@@ -37,6 +37,7 @@ func (c *FakeCli) Err() io.Writer {
 	return c.err
 }
 
+// NewFakeCli returns a fake for the cli.Cli interface
 func NewFakeCli(opts ...func(*FakeCli)) *FakeCli {
 	outBuffer := new(bytes.Buffer)
 	errBuffer := new(bytes.Buffer)

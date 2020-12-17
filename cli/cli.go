@@ -7,7 +7,7 @@ import (
 
 // Cli represents the command line client.
 type Cli interface {
-	In() io.Reader
+	In() io.ReadCloser
 	Out() io.Writer
 	Err() io.Writer
 }
@@ -15,7 +15,7 @@ type Cli interface {
 // cli is an instance the command line client.
 // Instances of the client can be returned from NewCli.
 type cli struct {
-	in  io.Reader
+	in  io.ReadCloser
 	out io.Writer
 	err io.Writer
 }
@@ -32,7 +32,7 @@ func NewCli() *cli {
 }
 
 // In returns the reader used for stdin
-func (cli *cli) In() io.Reader {
+func (cli *cli) In() io.ReadCloser {
 	return cli.in
 }
 
