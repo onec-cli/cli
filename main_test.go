@@ -3,9 +3,9 @@ package main_test
 import (
 	"bytes"
 	"github.com/onec-cli/cli/cli/build"
+	"github.com/onec-cli/cli/internal/test"
 	"io"
 	"io/ioutil"
-	"strings"
 	"testing"
 
 	"github.com/onec-cli/cli/cmd"
@@ -15,43 +15,6 @@ import (
 
 var discard = ioutil.NopCloser(bytes.NewBuffer(nil))
 
-// todo вынести в internal/test
-type FakeCli struct {
-	in  io.ReadCloser
-	out io.Writer
-	err io.Writer
-}
-
-// In returns the input stream the cli will use
-func (c *FakeCli) In() io.ReadCloser {
-	return c.in
-}
-
-// Out returns the output stream (stdout) the cli should write on
-func (c *FakeCli) Out() io.Writer {
-	return c.out
-}
-
-// Err returns the output stream (stderr) the cli should write on
-func (c *FakeCli) Err() io.Writer {
-	return c.err
-}
-
-// NewFakeCli returns a fake for the cli.Cli interface
-func NewFakeCli(opts ...func(*FakeCli)) *FakeCli {
-	outBuffer := new(bytes.Buffer)
-	errBuffer := new(bytes.Buffer)
-	c := &FakeCli{
-		out: outBuffer,
-		err: errBuffer,
-		in:  ioutil.NopCloser(strings.NewReader("")),
-	}
-	for _, opt := range opts {
-		opt(c)
-	}
-	return c
-}
-
 func runCliCommand(t *testing.T, r io.ReadCloser, w io.Writer, args ...string) error {
 	t.Helper()
 	if r == nil {
@@ -60,15 +23,15 @@ func runCliCommand(t *testing.T, r io.ReadCloser, w io.Writer, args ...string) e
 	if w == nil {
 		w = ioutil.Discard
 	}
-	in := func(cli *FakeCli) {
-		cli.in = r
+	in := func(cli *test.FakeCli) {
+		cli.SetIn(r)
 	}
-	combined := func(cli *FakeCli) {
-		cli.out = w
-		cli.err = w
+	combined := func(cli *test.FakeCli) {
+		cli.SetOut(w)
+		cli.SetErr(w)
 
 	}
-	cli := NewFakeCli(in, combined)
+	cli := test.NewFakeCli(in, combined)
 	command := cmd.NewRootCommand(cli)
 	command.SetArgs(args)
 	return command.Execute()
