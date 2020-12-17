@@ -29,14 +29,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-const APP_NAME = "onec" // todo temp
-
 var cfgFile string
 
 func NewRootCommand(cli cli.Cli) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   "cli",
+		Use:   build.APP_NAME,
 		Short: "A brief description of your application",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -61,6 +59,7 @@ to quickly create a Cobra application.`,
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	cmd.SetOut(cli.Out())
+
 	AddCommands(cli, cmd)
 
 	return cmd
@@ -87,13 +86,13 @@ func initConfig() {
 
 		// Search config in home directory with name ".cli" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName("." + APP_NAME)
+		viper.SetConfigName("." + build.APP_NAME)
 		viper.SetConfigType("json")
 
 		//viper.WriteConfigAs(filepath.Join(home, ".cli.json"))//todo test
 	}
 
-	viper.SetEnvPrefix(APP_NAME)
+	viper.SetEnvPrefix(build.APP_NAME)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

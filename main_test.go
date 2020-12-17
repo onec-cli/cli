@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"bytes"
+	"github.com/onec-cli/cli/cli/build"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -88,5 +89,5 @@ func TestVersion(t *testing.T) {
 	var b bytes.Buffer
 	err := runCliCommand(t, nil, &b, "--version")
 	assert.NilError(t, err)
-	assert.Check(t, is.Contains(b.String(), "cli version unknown, build unknown, time unknown")) //todo cli rename
+	assert.Check(t, is.Contains(b.String(), build.APP_NAME+" version unknown, build unknown, time unknown"))
 }
