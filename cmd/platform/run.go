@@ -18,13 +18,13 @@ package platform
 
 import (
 	"fmt"
-	"github.com/onec-cli/cli/client"
+	"github.com/onec-cli/cli/cli"
 
 	"github.com/spf13/cobra"
 )
 
-// NewRunCommand creates a new cobra.Command for `cli platform run` // todo rename cli
-func NewRunCommand(_ client.Client) *cobra.Command {
+// NewRunCommand creates a new cobra.Command for `cli platform run`
+func NewRunCommand(_ cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "run",
 		Aliases: []string{"r"},
