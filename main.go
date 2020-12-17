@@ -24,12 +24,9 @@ import (
 )
 
 func main() {
-
 	cli := cli.NewCli()
-	command := cmd.NewRootCommand(cli)
-	if err := command.Execute(); err != nil {
-		fmt.Println(err)
+	if err := cmd.NewRootCommand(cli).Execute(); err != nil {
+		fmt.Fprintln(cli.Err(), "Error:", err) //todo magic words
 		os.Exit(1)
 	}
-	//command.Execute()
 }

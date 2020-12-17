@@ -11,4 +11,5 @@ require (
 	github.com/v8platform/errors v0.1.0
 	github.com/v8platform/marshaler v0.1.1
 	github.com/v8platform/runner v0.3.1
+	gotest.tools/v3 v3.0.3
 )

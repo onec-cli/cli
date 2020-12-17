@@ -2,7 +2,7 @@ package platform
 
 import (
 	"context"
-	. "github.com/onec-cli/cli/cmd/spinner"
+	. "github.com/onec-cli/cli/cli/spinner"
 	"github.com/onec-cli/cli/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 
 	// common
 	cmd.Flags().StringP("out", "o", "", "out file")
-	cmd.Flags().BoolP("out-trunc", "", true, "truncate out file")
+	cmd.Flags().BoolP("out-trunc", "", false, "truncate out file")
 
 	// Viper bind
 	viper.BindPFlag("usr", cmd.PersistentFlags().Lookup("user"))
@@ -95,7 +95,7 @@ func runCreate(args []string) {
 		}
 
 		opts := options()
-		platformRunner := runner.NewPlatformRunner(nil, what, opts)
+		platformRunner := runner.NewPlatformRunner(nil, what, opts...)
 
 		Spinner.Stop()
 		log.Printf("=> %v\n", platformRunner.Args())
@@ -119,7 +119,7 @@ func runCreate(args []string) {
 	Spinner.Stop()
 }
 
-func options() []runner.Option {
+func options() []interface{} {
 
 	out := viper.GetString("out")
 	if out == "" {
@@ -127,7 +127,7 @@ func options() []runner.Option {
 	}
 	t := viper.GetBool("out-trunc")
 
-	var o []runner.Option
+	var o []interface{}
 	o = append(o, runner.WithOut(out, t))
 
 	return o
