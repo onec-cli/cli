@@ -46,13 +46,13 @@ func (o *defaultOptions) bind(opts map[string]interface{}) {
 	elem := reflect.ValueOf(o).Elem()
 	for i := 0; i < typeOf.NumField(); i++ {
 		field := typeOf.Field(i)
-		new := opts[strings.ToLower(field.Name)]
+		n := opts[strings.ToLower(field.Name)]
 		target := elem.FieldByName(field.Name)
 		switch target.Interface().(type) {
 		case string:
-			target.SetString(cast.ToString(new))
+			target.SetString(cast.ToString(n))
 		case bool:
-			target.SetBool(cast.ToBool(new))
+			target.SetBool(cast.ToBool(n))
 		}
 	}
 }
