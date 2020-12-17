@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"github.com/onec-cli/cli/cli"
 	. "github.com/onec-cli/cli/cli/spinner"
 	"github.com/onec-cli/cli/platform"
 	"github.com/spf13/cobra"
@@ -12,10 +13,11 @@ import (
 )
 
 // NewCreateCommand creates a new cobra.Command for `cli platform create`
-func NewCreateCommand() *cobra.Command {
+func NewCreateCommand(_ cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "create CONNECTION_STRING...",
-		Short: "Create new infobase",
+		Use:     "create CONNECTION_STRING...",
+		Aliases: []string{"c"},
+		Short:   "Create new infobase",
 		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

@@ -18,15 +18,17 @@ package platform
 
 import (
 	"fmt"
+	"github.com/onec-cli/cli/cli"
 
 	"github.com/spf13/cobra"
 )
 
 // NewRunCommand creates a new cobra.Command for `cli platform run`
-func NewRunCommand() *cobra.Command {
+func NewRunCommand(_ cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "run",
-		Short: "A brief description of your command",
+		Use:     "run",
+		Aliases: []string{"r"},
+		Short:   "A brief description of your command",
 		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 

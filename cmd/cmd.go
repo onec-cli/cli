@@ -61,12 +61,15 @@ to quickly create a Cobra application.`,
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	cmd.SetOut(cli.Out())
-	//commands.AddCommands(cmd, cli)
-	// add all commands by category to the root command
-	cmd.AddCommand(platform.NewPlatformCommand()) //todo пробросить cli
-	cmd.AddCommand(config.NewConfigCommand())
+	AddCommands(cli, cmd)
 
 	return cmd
+}
+
+// AddCommands adds all the commands from ./cmd to the root command
+func AddCommands(cli cli.Cli, cmd *cobra.Command) {
+	cmd.AddCommand(platform.NewPlatformCommand(cli))
+	cmd.AddCommand(config.NewConfigCommand(cli))
 }
 
 // initConfig reads in config file and ENV variables if set.
