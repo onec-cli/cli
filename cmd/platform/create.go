@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/onec-cli/cli/cli"
 	. "github.com/onec-cli/cli/cli/spinner"
-	"github.com/onec-cli/cli/platform"
+	"github.com/onec-cli/cli/internal/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	v8errors "github.com/v8platform/errors"
@@ -72,7 +72,7 @@ to quickly create a Cobra application.`,
 	return cmd
 }
 
-func runCreate(args []string) {
+func runCreate(connectPaths []string) {
 
 	log.Println("Creation infobase started:")
 
@@ -84,7 +84,7 @@ func runCreate(args []string) {
 		return
 	}
 
-	infobases := platform.NewInfobases(args, defaultOptions...)
+	infobases := platform.NewInfobases(connectPaths, defaultOptions...)
 
 	for i, infobase := range infobases {
 

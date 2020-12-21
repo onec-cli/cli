@@ -1,7 +1,7 @@
 package platform_test
 
 import (
-	"github.com/onec-cli/cli/platform"
+	"github.com/onec-cli/cli/internal/platform"
 	"reflect"
 	"testing"
 )

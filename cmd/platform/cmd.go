@@ -2,6 +2,7 @@ package platform
 
 import (
 	"github.com/onec-cli/cli/cli"
+	"github.com/onec-cli/cli/cmd/platform/dump"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +25,7 @@ to quickly create a Cobra application.`,
 	cmd.AddCommand(
 		NewCreateCommand(cli),
 		NewRunCommand(cli),
+		dump.NewDumpCommand(cli),
 	)
 	return cmd
 }

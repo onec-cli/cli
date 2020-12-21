@@ -11,12 +11,12 @@ var errInvalidConnectionString = errors.New("invalid connection string format")
 func NewInfobases(ib []string, opts ...string) []*infobase {
 	var r []*infobase
 	for _, c := range ib {
-		command := &connectionString{connectionString: c}
-		err := command.parse()
+		connectPath := &connectionString{connectionString: c}
+		err := connectPath.parse()
 		if err == nil {
-			command.defaultOptions(opts)
+			connectPath.defaultOptions(opts)
 		}
-		r = append(r, newInfobase(command, err))
+		r = append(r, newInfobase(connectPath, err))
 	}
 	return r
 }
