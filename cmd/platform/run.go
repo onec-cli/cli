@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewRunCommand creates a new cobra.Command for `cli platform run`
+// NewRunCommand creates a new cobra.Command for `onec platform run`
 func NewRunCommand(_ cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "run",

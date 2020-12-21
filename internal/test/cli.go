@@ -8,9 +8,10 @@ import (
 )
 
 type FakeCli struct {
-	in  io.ReadCloser
-	out io.Writer
-	err io.Writer
+	in        io.ReadCloser
+	out       io.Writer
+	outBuffer *bytes.Buffer
+	err       io.Writer
 }
 
 // In returns the input stream the cli will use
@@ -26,6 +27,11 @@ func (c *FakeCli) Out() io.Writer {
 // Err returns the output stream (stderr) the cli should write on
 func (c *FakeCli) Err() io.Writer {
 	return c.err
+}
+
+// OutBuffer returns the stdout buffer
+func (c *FakeCli) OutBuffer() *bytes.Buffer {
+	return c.outBuffer
 }
 
 // SetIn sets the input of the cli to the specified io.ReadCloser
@@ -48,9 +54,10 @@ func NewFakeCli(opts ...func(*FakeCli)) *FakeCli {
 	outBuffer := new(bytes.Buffer)
 	errBuffer := new(bytes.Buffer)
 	c := &FakeCli{
-		out: outBuffer,
-		err: errBuffer,
-		in:  ioutil.NopCloser(strings.NewReader("")),
+		out:       outBuffer,
+		err:       errBuffer,
+		outBuffer: outBuffer,
+		in:        ioutil.NopCloser(strings.NewReader("")),
 	}
 	for _, opt := range opts {
 		opt(c)

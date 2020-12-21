@@ -12,7 +12,7 @@ import (
 	"log"
 )
 
-// NewCreateCommand creates a new cobra.Command for `cli platform create`
+// NewCreateCommand creates a new cobra.Command for `onec platform create`
 func NewCreateCommand(_ cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create CONNECTION_STRING...",
