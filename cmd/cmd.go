@@ -34,7 +34,7 @@ var cfgFile string
 func NewRootCommand(cli cli.Cli) *cobra.Command {
 
 	cmd := &cobra.Command{
-		Use:   build.APP_NAME,
+		Use:   build.AppName,
 		Short: "A brief description of your application",
 		Long: `A longer description that spans multiple lines and likely contains
 examples and usage of using your application. For example:
@@ -43,7 +43,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		SilenceErrors: true,
-		Version:       fmt.Sprintf("%s, build %s, time %s", build.Version, build.GitCommit, build.Time),
+		Version:       fmt.Sprintf("%s, build %s, time %s", build.Version, build.Commit, build.Time),
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -86,13 +86,13 @@ func initConfig() {
 
 		// Search config in home directory with name ".cli" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName("." + build.APP_NAME)
+		viper.SetConfigName("." + build.AppName)
 		viper.SetConfigType("json")
 
 		//viper.WriteConfigAs(filepath.Join(home, ".cli.json"))//todo test
 	}
 
-	viper.SetEnvPrefix(build.APP_NAME)
+	viper.SetEnvPrefix(build.AppName)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

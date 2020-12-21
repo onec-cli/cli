@@ -53,5 +53,5 @@ func TestVersion(t *testing.T) {
 	var b bytes.Buffer
 	err := runCliCommand(t, nil, &b, "--version")
 	assert.NilError(t, err)
-	assert.Check(t, is.Contains(b.String(), build.APP_NAME+" version unknown, build unknown, time unknown"))
+	assert.Check(t, is.Contains(b.String(), build.AppName+" version unknown, build unknown, time unknown"))
 }

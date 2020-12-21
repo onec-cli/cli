@@ -1,11 +1,11 @@
 package build
 
-const APP_NAME = "onec"
+const AppName = "onec" // todo заменяются ли константы --ldflags?
 
 // Default build-time variable.
 // These values are overridden via go build --ldflags
 var (
-	Version   = "unknown"
-	GitCommit = "unknown"
-	Time      = "unknown"
+	Version = "unknown"
+	Commit  = "unknown"
+	Time    = "unknown"
 )
