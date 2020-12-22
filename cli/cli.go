@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/onec-cli/cli/api"
 	"io"
 	"os"
 )
@@ -10,14 +11,16 @@ type Cli interface {
 	In() io.ReadCloser
 	Out() io.Writer
 	Err() io.Writer
+	Platform() api.Platform
 }
 
 // cli is an instance the command line client.
 // Instances of the client can be returned from NewCli.
 type cli struct {
-	in  io.ReadCloser
-	out io.Writer
-	err io.Writer
+	in       io.ReadCloser
+	out      io.Writer
+	err      io.Writer
+	platform api.Platform
 }
 
 // NewCli returns a cli instance with all operators applied on it.
@@ -44,4 +47,9 @@ func (cli *cli) Out() io.Writer {
 // Err returns the writer used for stderr
 func (cli *cli) Err() io.Writer {
 	return cli.err
+}
+
+// Platform returns the api.Platform
+func (cli *cli) Platform() api.Platform {
+	return cli.platform
 }

@@ -31,7 +31,7 @@ func runCliCommand(t *testing.T, r io.ReadCloser, w io.Writer, args ...string) e
 		cli.SetErr(w)
 
 	}
-	cli := test.NewFakeCli(in, combined)
+	cli := test.NewFakeCli(nil, in, combined)
 	command := cmd.NewRootCommand(cli)
 	command.SetArgs(args)
 	return command.Execute()

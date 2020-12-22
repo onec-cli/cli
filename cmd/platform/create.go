@@ -48,7 +48,7 @@ to quickly create a Cobra application.`,
 
 	// common
 	cmd.Flags().StringP("out", "o", "", "out file")
-	cmd.Flags().BoolP("out-trunc", "", false, "truncate out file")
+	cmd.Flags().BoolP("out-trunc", "", false, "truncate out file") //todo out-no-trunc
 
 	// Viper bind
 	viper.BindPFlag("usr", cmd.PersistentFlags().Lookup("user"))
