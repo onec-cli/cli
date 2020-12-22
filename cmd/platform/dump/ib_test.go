@@ -2,7 +2,6 @@ package dump_test
 
 import (
 	"errors"
-	"github.com/onec-cli/cli/api"
 	"github.com/onec-cli/cli/cmd/platform/dump"
 	"github.com/onec-cli/cli/internal/test"
 	"gotest.tools/v3/assert"
@@ -14,15 +13,14 @@ import (
 )
 
 type fakeClient struct {
-	api.Platform
-	dumpIB func(string) (*os.File, error)
+	dumpIB func(string) error
 }
 
-func (f *fakeClient) DumpIB(file string) (*os.File, error) {
+func (f *fakeClient) DumpIB(file string) error {
 	if f.dumpIB != nil {
 		return f.dumpIB(file)
 	}
-	return nil, nil
+	return nil
 }
 
 func TestNewDumpIBCommandErrors(t *testing.T) {
@@ -30,7 +28,7 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 		name          string
 		args          []string
 		expectedError string
-		dumpIBFunc    func(file string) (*os.File, error)
+		dumpIBFunc    func(file string) error
 	}{
 		{
 			name:          "wrong-args",
@@ -52,8 +50,8 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 				return []string{filepath.Join(dir, "foo.dt")}
 			}(),
 			expectedError: "something went wrong",
-			dumpIBFunc: func(file string) (*os.File, error) {
-				return nil, errors.New("something went wrong")
+			dumpIBFunc: func(file string) error {
+				return errors.New("something went wrong")
 			},
 		},
 	}
@@ -71,22 +69,21 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 }
 
 func TestNewDumpIBToFile(t *testing.T) {
-	dir := fs.NewDir(t, "dump-ib")
-	defer dir.Remove()
+
+	foo := fs.NewFile(t, "foo.dt")
+	defer foo.Remove()
 
 	cmd := dump.NewDumpIBCommand(test.NewFakeCli(&fakeClient{
-		Platform: nil,
-		dumpIB: func(file string) (*os.File, error) {
-			return nil, nil
+		dumpIB: func(file string) error {
+			return ioutil.WriteFile(file, []byte("boo"), 0644)
 		},
 	}))
-	cmd.SetArgs([]string{dir.Join("foo.dt")})
-
+	cmd.SetArgs([]string{foo.Path()})
 	assert.NilError(t, cmd.Execute())
-	expected := fs.Expected(t,
-		fs.WithFile("foo.dt", "", fs.MatchAnyFileMode),
-	)
-	assert.Assert(t, fs.Equal(dir.Path(), expected))
+
+	content, err := ioutil.ReadFile(foo.Path())
+	assert.NilError(t, err)
+	assert.Assert(t, string(content) == "boo")
 }
 
 //func TestNewDumpIBToFileIntegrate(t *testing.T) {

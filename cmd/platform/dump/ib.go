@@ -35,7 +35,7 @@ func runDumpIB(cli cli.Cli, file string) error {
 	if err := ValidateOutputPath(file); err != nil {
 		return errors.Wrap(err, "failed to export infobase")
 	}
-	_, err := cli.Platform().DumpIB(file)
+	err := cli.Platform().DumpIB(file)
 
 	if err != nil {
 		return err
