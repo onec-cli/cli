@@ -12,7 +12,7 @@ import (
 )
 
 // NewDumpIBCommand creates a new cobra.Command for `onec platform dump ib`
-func NewDumpIBCommand(_ cli.Cli) *cobra.Command {
+func NewDumpIBCommand(cli cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "ib FILE",
 		Aliases: []string{"i"},
@@ -25,21 +25,32 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := ValidateOutputPath(args[0]); err != nil {
-				return errors.Wrap(err, "failed to export infobase")
-			}
-			//ib, err := v8.NewTempIB()
-			//
-			//what := v8.DumpIB(args[0])
-			//platformRunner := runner.NewPlatformRunner(ib, what)
-			//err = platformRunner.Run(nil)
-			//if err != nil {
-			//	return err
-			//}
-			return nil
+			return runDumpIB(cli, args[0])
 		},
 	}
 	return cmd
+}
+
+func runDumpIB(cli cli.Cli, file string) error {
+	if err := ValidateOutputPath(file); err != nil {
+		return errors.Wrap(err, "failed to export infobase")
+	}
+	_, err := cli.Platform().DumpIB(file)
+
+	if err != nil {
+		return err
+	}
+
+	//ib, err := v8.NewTempIB()
+	//
+	//what := v8.DumpIB(file)
+	//platformRunner := runner.NewPlatformRunner(ib, what)
+	//err = platformRunner.Run(nil)
+	//if err != nil {
+	//	return err
+	//}
+
+	return nil
 }
 
 // todo кандидаты на вынос в отдельный модуль
