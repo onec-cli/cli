@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+//todo избыточный хрупкий тест? надо ли проверять подкоманды без действий?
 func TestNewDumpCommand(t *testing.T) {
 	cmd := NewDumpCommand(test.NewFakeCli())
 	cmd.SetOut(ioutil.Discard)
