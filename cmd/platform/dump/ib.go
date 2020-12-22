@@ -5,8 +5,6 @@ import (
 	"github.com/onec-cli/cli/cli"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	_ "github.com/v8platform/api"
-	//"github.com/v8platform/runner"
 	"os"
 	"path/filepath"
 )
