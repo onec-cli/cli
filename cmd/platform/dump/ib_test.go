@@ -71,17 +71,19 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 func TestNewDumpIBToFile(t *testing.T) {
 
 	foo := fs.NewFile(t, "foo.dt")
-	defer foo.Remove()
+	fooPath := foo.Path()
+	foo.Remove()
+	defer os.Remove(fooPath)
 
 	cmd := dump.NewDumpIBCommand(test.NewFakeCli(&fakeClient{
 		dumpIB: func(file string) error {
 			return ioutil.WriteFile(file, []byte("boo"), 0644)
 		},
 	}))
-	cmd.SetArgs([]string{foo.Path()})
+	cmd.SetArgs([]string{fooPath})
 	assert.NilError(t, cmd.Execute())
 
-	content, err := ioutil.ReadFile(foo.Path())
+	content, err := ioutil.ReadFile(fooPath)
 	assert.NilError(t, err)
 	assert.Assert(t, string(content) == "boo")
 }
