@@ -24,9 +24,7 @@ type dumpOptions struct {
 
 // NewDumpIBCommand creates a new cobra.Command for `onec platform dump ib`
 func NewDumpIBCommand(cli cli.Cli) *cobra.Command {
-
 	var opts dumpOptions
-
 	cmd := &cobra.Command{
 		Use:     "ib FILE",
 		Aliases: []string{"i"},
@@ -43,7 +41,6 @@ to quickly create a Cobra application.`,
 			return runDumpIB(cli, opts)
 		},
 	}
-
 	cmd.Flags().StringVar(&opts.ibConnection, "ibconnection", "", "ibconnection (required)")
 	logIfError(cmd.MarkFlagRequired("ibconnection"))
 
