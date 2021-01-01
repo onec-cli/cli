@@ -17,9 +17,15 @@ func logIfError(err error) {
 	}
 }
 
+type dumpOptions struct {
+	file         string
+	ibConnection string
+}
+
 // NewDumpIBCommand creates a new cobra.Command for `onec platform dump ib`
 func NewDumpIBCommand(cli cli.Cli) *cobra.Command {
-	var ibConn string
+
+	var opts dumpOptions
 
 	cmd := &cobra.Command{
 		Use:     "ib FILE",
@@ -33,22 +39,23 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDumpIB(cli, args[0])
+			opts.file = args[0]
+			return runDumpIB(cli, opts)
 		},
 	}
 
-	cmd.Flags().StringVar(&ibConn, "ibconnection", "", "ibconnection (required)")
+	cmd.Flags().StringVar(&opts.ibConnection, "ibconnection", "", "ibconnection (required)")
 	logIfError(cmd.MarkFlagRequired("ibconnection"))
 
 	return cmd
 }
 
-func runDumpIB(cli cli.Cli, file string) error {
-	if err := ValidateOutputPath(file); err != nil {
+func runDumpIB(cli cli.Cli, opts dumpOptions) error {
+	if err := ValidateOutputPath(opts.file); err != nil {
 		return errors.Wrap(err, "failed to export infobase")
 	}
 
-	err := cli.NewRunner(nil).DumpIB(file)
+	err := cli.NewRunner(nil).DumpIB(opts.file)
 	if err != nil {
 		return err
 	}
