@@ -36,10 +36,16 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 			expectedError: "accepts 1 arg(s), received 0",
 		},
 		{
+			name:          "missed-flag-ibconnection",
+			args:          []string{"foo.dt"},
+			expectedError: `required flag(s) "ibconnection" not set`,
+		},
+		{
 			name: "wrong-path",
 			args: func() []string {
 				dir := os.TempDir()
-				return []string{filepath.Join(dir, "notexist_parent", "notexist_child")}
+				file := filepath.Join(dir, "notexist_parent", "notexist_child", "foo.dt")
+				return []string{"--ibconnection", "/F./build", file}
 			}(),
 			expectedError: "failed to export infobase: invalid output path",
 		},
@@ -47,7 +53,7 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 			name: "client-error",
 			args: func() []string {
 				dir := os.TempDir()
-				return []string{filepath.Join(dir, "foo.dt")}
+				return []string{"--ibconnection", "/F./build", filepath.Join(dir, "foo.dt")}
 			}(),
 			expectedError: "something went wrong",
 			dumpIBFunc: func(file string) error {
@@ -80,7 +86,7 @@ func TestNewDumpIBToFile(t *testing.T) {
 			return ioutil.WriteFile(file, []byte("boo"), 0644)
 		},
 	}))
-	cmd.SetArgs([]string{fooPath})
+	cmd.SetArgs([]string{"--ibconnection", "/F./build", fooPath})
 	assert.NilError(t, cmd.Execute())
 
 	content, err := ioutil.ReadFile(fooPath)

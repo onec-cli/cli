@@ -5,12 +5,22 @@ import (
 	"github.com/onec-cli/cli/cli"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
 	"path/filepath"
 )
 
+//todo кандидат на мув ап
+func logIfError(err error) {
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 // NewDumpIBCommand creates a new cobra.Command for `onec platform dump ib`
 func NewDumpIBCommand(cli cli.Cli) *cobra.Command {
+	var ibConn string
+
 	cmd := &cobra.Command{
 		Use:     "ib FILE",
 		Aliases: []string{"i"},
@@ -26,6 +36,10 @@ to quickly create a Cobra application.`,
 			return runDumpIB(cli, args[0])
 		},
 	}
+
+	cmd.Flags().StringVar(&ibConn, "ibconnection", "", "ibconnection (required)")
+	logIfError(cmd.MarkFlagRequired("ibconnection"))
+
 	return cmd
 }
 
@@ -33,8 +47,8 @@ func runDumpIB(cli cli.Cli, file string) error {
 	if err := ValidateOutputPath(file); err != nil {
 		return errors.Wrap(err, "failed to export infobase")
 	}
-	err := cli.Platform().DumpIB(file)
 
+	err := cli.NewRunner(nil).DumpIB(file)
 	if err != nil {
 		return err
 	}
