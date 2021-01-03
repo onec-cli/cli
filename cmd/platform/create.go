@@ -1,19 +1,16 @@
 package platform
 
 import (
-	"context"
 	"github.com/onec-cli/cli/cli"
-	. "github.com/onec-cli/cli/cli/spinner"
 	"github.com/onec-cli/cli/internal/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	v8errors "github.com/v8platform/errors"
 	"github.com/v8platform/runner"
 	"log"
 )
 
 // NewCreateCommand creates a new cobra.Command for `onec platform create`
-func NewCreateCommand(_ cli.Cli) *cobra.Command {
+func NewCreateCommand(cli cli.Cli) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create CONNECTION_STRING...",
 		Aliases: []string{"c"},
@@ -26,7 +23,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			runCreate(args)
+			runCreate(cli, args)
 		},
 	}
 
@@ -72,11 +69,11 @@ to quickly create a Cobra application.`,
 	return cmd
 }
 
-func runCreate(connectPaths []string) {
+func runCreate(cli cli.Cli, connPaths []string) {
 
 	log.Println("Creation infobase started:")
 
-	Spinner.Start()
+	//Spinner.Start()
 
 	// todo DefaultOptions to def conn str
 	defaultOptions, err := platform.DefaultOptions(viper.AllSettings())
@@ -84,41 +81,47 @@ func runCreate(connectPaths []string) {
 		return
 	}
 
-	infobases := platform.NewInfobases(connectPaths, defaultOptions...)
-
-	for i, infobase := range infobases {
-
-		log.Printf("infobase #%d\n", i+1)
-
-		what, err := infobase.Command()
-		if err != nil {
-			log.Println("error: ", err)
+	for _, path := range connPaths {
+		infobase := cli.Infobase(path, defaultOptions...)
+		if infobase.Error() != nil {
 			continue
 		}
-
-		opts := options()
-		platformRunner := runner.NewPlatformRunner(nil, what, opts...)
-
-		Spinner.Stop()
-		log.Printf("=> %v\n", platformRunner.Args())
-		Spinner.Start()
-		err = platformRunner.Run(context.Background())
-
-		Spinner.Stop()
-		if err != nil {
-			// todo много букв
-			errorContext := v8errors.GetErrorContext(err)
-			out, ok := errorContext["message"]
-			if ok {
-				err = v8errors.Internal.Wrap(err, out)
-			}
-			log.Println("error: ", err)
-		} else {
-			log.Println("infobase created")
-		}
-		Spinner.Start()
+		infobase.Create()
 	}
-	Spinner.Stop()
+
+	//	infobases := platform.NewInfobases(connPaths, defaultOptions...)
+
+	//for i, infobase := range infobases {
+	//
+	//	log.Printf("infobase #%d\n", i+1)
+	//
+	//	if infobase.Err() != nil {
+	//		log.Println("error: ", err)
+	//		continue
+	//	}
+	//	opts := options()
+	//	platformRunner := runner.NewPlatformRunner(nil, infobase, opts...)
+	//
+	//	Spinner.Stop()
+	//	log.Printf("=> %v\n", platformRunner.Args())
+	//	Spinner.Start()
+	//	err = platformRunner.Run(context.Background())
+	//
+	//	Spinner.Stop()
+	//	if err != nil {
+	//		// todo много букв
+	//		errorContext := v8errors.GetErrorContext(err)
+	//		out, ok := errorContext["message"]
+	//		if ok {
+	//			err = v8errors.Internal.Wrap(err, out)
+	//		}
+	//		log.Println("error: ", err)
+	//	} else {
+	//		log.Println("infobase created")
+	//	}
+	//	Spinner.Start()
+	//}
+	//Spinner.Stop()
 }
 
 func options() []interface{} {

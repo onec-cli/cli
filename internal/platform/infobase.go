@@ -1,132 +1,81 @@
 package platform
 
 import (
-	"errors"
+	"fmt"
+	v8 "github.com/v8platform/api"
 	"github.com/v8platform/runner"
-	"strings"
 )
 
-var errInvalidConnectionString = errors.New("invalid connection string format")
+type infobase struct {
+	connStr *connStr
+	err     error
+}
+
+func (i *infobase) ConnectionString() string {
+	panic("implement me")
+}
+
+func NewInfobase(connPath string, opts ...string) *infobase {
+	c, err := NewConnStr(connPath)
+	if err == nil {
+		c.defaultOptions(opts)
+	}
+	return &infobase{
+		connStr: c,
+		err:     err,
+	}
+}
+
+func (i *infobase) DumpIB(file string) error {
+	r := runner.NewPlatformRunner(i, v8.DumpIB(file))
+	err := r.Run(nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *infobase) Create() {
+	fmt.Println(i.Values())
+}
+
+func (i *infobase) Error() error {
+	return i.err
+}
 
 func NewInfobases(ib []string, opts ...string) []*infobase {
 	var r []*infobase
 	for _, c := range ib {
-		connectPath := &connectionString{connectionString: c}
-		err := connectPath.parse()
+		connStr, err := NewConnStr(c)
 		if err == nil {
-			connectPath.defaultOptions(opts)
+			connStr.defaultOptions(opts)
 		}
-		r = append(r, newInfobase(connectPath, err))
+		r = append(r, newInfobase(connStr, err))
 	}
 	return r
 }
 
-type infobase struct {
-	command runner.Command
-	err     error
+func newInfobase(connStr *connStr, err error) *infobase {
+	return &infobase{connStr: connStr, err: err}
 }
 
-func newInfobase(command runner.Command, err error) *infobase {
-	return &infobase{command: command, err: err}
-}
-
-func (i *infobase) Command() (runner.Command, error) {
-	return i.command, i.err
-}
-
-type connType int
-
-const (
-	File connType = iota
-	ClientServer
-)
-
-type connectionString struct {
-	connectionString string
-	values           []string
-	connType         connType
-}
-
-func (c *connectionString) Command() string {
+func (i *infobase) Command() string {
 	return runner.CreateInfobase
 }
 
-func (c *connectionString) Check() error {
+func (i *infobase) Check() error {
 	return nil
 }
 
-func (c *connectionString) Values() []string {
-	return c.values
+func (i *infobase) Values() []string {
+	return i.connStr.values
 }
 
-func (c *connectionString) removeEmpty() {
-	if c.values == nil {
-		return
-	}
-	n := c.values[:0]
-	for _, v := range c.values {
-		if v != "" {
-			n = append(n, v)
-		}
-	}
-	c.values = n
-}
+//func (i *infobase) ConnectionString() string {
+//	connString := strings.Join(i.connStr.Values(), ";")
+//	return fmt.Sprintf("/IBConnectionString %s", connString)
+//}
 
-func (c *connectionString) parse() error {
-	var values []string
-	s := strings.Trim(c.connectionString, " ;")
-	switch {
-	case strings.HasPrefix(strings.ToUpper(s), "/F"):
-		values = makeFileStrings(s)
-	case strings.HasPrefix(strings.ToUpper(s), "/S"):
-		c.connType = ClientServer
-		values = makeServerStrings(s)
-		if values == nil {
-			return errInvalidConnectionString
-		}
-	case strings.Contains(strings.ToUpper(s), "FILE="):
-		values = strings.Split(s, ";")
-	case strings.Contains(strings.ToUpper(s), "SRVR="):
-		c.connType = ClientServer
-		values = strings.Split(s, ";")
-	default:
-		return errInvalidConnectionString
-	}
-	c.values = append(c.values, values...)
-	c.removeEmpty()
-	return nil
-}
-
-func (c *connectionString) defaultOptions(opts []string) {
-	if c.connType != ClientServer {
-		return
-	}
-exit:
-	for _, s := range opts {
-		params := strings.SplitAfter(s, "=")
-		for _, value := range c.values {
-			if strings.HasPrefix(value, params[0]) {
-				continue exit
-			}
-		}
-		c.values = append(c.values, s)
-	}
-}
-
-func makeFileStrings(s string) []string {
-	var r []string
-	s = s[2:]
-	return append(r, "File="+strings.Trim(s, " "))
-}
-
-func makeServerStrings(s string) []string {
-	var r []string
-	s = s[2:]
-	params := strings.Split(s, "\\")
-	if len(params) != 2 {
-		return nil
-	}
-	srvr := "Srvr=" + strings.TrimSpace(params[0])
-	ref := "Ref=" + strings.TrimSpace(params[1])
-	return append(r, srvr, ref)
+func (i *infobase) Err() error {
+	return i.err
 }

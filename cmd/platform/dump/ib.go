@@ -54,7 +54,7 @@ func runDumpIB(cli cli.Cli, opts dumpOptions) error {
 		return errors.Wrap(err, "failed to export infobase")
 	}
 
-	err := cli.NewInfobase(opts.connPath).DumpIB(opts.file)
+	err := cli.Infobase(opts.connPath).DumpIB(opts.file)
 	if err != nil {
 		return err
 	}

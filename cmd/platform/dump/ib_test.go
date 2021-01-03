@@ -23,6 +23,14 @@ func (f *fakeClient) DumpIB(file string) error {
 	return nil
 }
 
+func (c *fakeClient) Create() {
+
+}
+
+func (c *fakeClient) Error() error {
+	return nil
+}
+
 func TestNewDumpIBCommandErrors(t *testing.T) {
 	testCases := []struct {
 		name          string

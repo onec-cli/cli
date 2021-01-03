@@ -1,7 +1,8 @@
 package api
 
-// Platform defines API methods for the 1C:Enterprise platform
-type Platform interface {
-	//DumpIB(ctx context.Context, file string) (*os.File, error)
+// Infobase defines API methods for the infobase
+type Infobase interface {
 	DumpIB(file string) error
+	Create()
+	Error() error
 }
