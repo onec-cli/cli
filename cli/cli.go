@@ -2,6 +2,7 @@ package cli
 
 import (
 	"github.com/onec-cli/cli/api"
+	"github.com/onec-cli/cli/internal/platform"
 	"io"
 	"os"
 )
@@ -11,16 +12,16 @@ type Cli interface {
 	In() io.ReadCloser
 	Out() io.Writer
 	Err() io.Writer
-	Platform() api.Platform
+	Infobase(connPath string, opts ...string) api.Infobase
 }
 
 // cli is an instance the command line client.
 // Instances of the client can be returned from NewCli.
 type cli struct {
-	in       io.ReadCloser
-	out      io.Writer
-	err      io.Writer
-	platform api.Platform
+	in  io.ReadCloser
+	out io.Writer
+	err io.Writer
+	ib  map[string]api.Infobase
 }
 
 // NewCli returns a cli instance with all operators applied on it.
@@ -30,6 +31,7 @@ func NewCli() *cli {
 		in:  os.Stdin,
 		out: os.Stdout,
 		err: os.Stderr,
+		ib:  make(map[string]api.Infobase),
 	}
 	return cli
 }
@@ -49,7 +51,11 @@ func (cli *cli) Err() io.Writer {
 	return cli.err
 }
 
-// Platform returns the api.Platform
-func (cli *cli) Platform() api.Platform {
-	return cli.platform
+//todo
+func (cli *cli) Infobase(connPath string, opts ...string) api.Infobase {
+	if ib, ok := cli.ib[connPath]; ok {
+		return ib
+	}
+	cli.ib[connPath] = platform.NewInfobase(connPath, opts...)
+	return cli.ib[connPath]
 }
