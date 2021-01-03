@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"github.com/onec-cli/cli/api"
+	"github.com/onec-cli/cli/internal/platform"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -13,7 +14,7 @@ type FakeCli struct {
 	out       io.Writer
 	outBuffer *bytes.Buffer
 	err       io.Writer
-	platform  api.Platform
+	ib        map[string]api.Infobase
 }
 
 // In returns the input stream the cli will use
@@ -36,9 +37,13 @@ func (c *FakeCli) OutBuffer() *bytes.Buffer {
 	return c.outBuffer
 }
 
-// Platform returns the API 1C:Enterprise platform the cli will use
-func (c *FakeCli) Platform() api.Platform {
-	return c.platform
+// NewInfobase returns the infobase the cli will use
+func (c *FakeCli) Infobase(connPath string, opts ...string) api.Infobase {
+	if ib, ok := c.ib["test"]; ok {
+		return ib
+	}
+	c.ib["test"] = platform.NewInfobase(connPath, opts...)
+	return c.ib["test"]
 }
 
 // SetIn sets the input of the cli to the specified io.ReadCloser
@@ -57,7 +62,7 @@ func (c *FakeCli) SetErr(err io.Writer) {
 }
 
 // NewFakeCli returns a fake for the cli.Cli interface
-func NewFakeCli(platform api.Platform, opts ...func(*FakeCli)) *FakeCli {
+func NewFakeCli(ib api.Infobase, opts ...func(*FakeCli)) *FakeCli {
 	outBuffer := new(bytes.Buffer)
 	errBuffer := new(bytes.Buffer)
 	c := &FakeCli{
@@ -65,7 +70,7 @@ func NewFakeCli(platform api.Platform, opts ...func(*FakeCli)) *FakeCli {
 		err:       errBuffer,
 		outBuffer: outBuffer,
 		in:        ioutil.NopCloser(strings.NewReader("")),
-		platform:  platform,
+		ib:        map[string]api.Infobase{"test": ib},
 	}
 	for _, opt := range opts {
 		opt(c)
