@@ -7,6 +7,9 @@ import (
 
 var errInvalidConnStr = errors.New("connection string: invalid format")
 
+// connStrOption applies a modification on a connStr.
+type connStrOption func(c *connStr) error
+
 type connType int
 
 const (
@@ -70,23 +73,6 @@ func (c *connStr) clean() {
 	c.values = n
 }
 
-//todo доделать перенос
-func (c *connStr) defaultOptions(opts []string) {
-	if c.connType != ClientServer {
-		return
-	}
-exit:
-	for _, s := range opts {
-		params := strings.SplitAfter(s, "=")
-		for _, value := range c.values {
-			if strings.HasPrefix(value, params[0]) {
-				continue exit
-			}
-		}
-		c.values = append(c.values, s)
-	}
-}
-
 func makeFileStrings(s string) []string {
 	var r []string
 	s = s[2:]
@@ -103,4 +89,35 @@ func makeServerStrings(s string) []string {
 	srvr := "Srvr=" + strings.TrimSpace(params[0])
 	ref := "Ref=" + strings.TrimSpace(params[1])
 	return append(r, srvr, ref)
+}
+
+// apply all the operation on the connStr
+func (c *connStr) apply(opts ...connStrOption) error {
+	for _, op := range opts {
+		if err := op(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// withDefaults appends a fragment <param>=<value> to the connection string values, skipping the addition
+// if the fragment already exists. Only for client-server connection.
+func withDefaults(opts []string) connStrOption {
+	return func(c *connStr) error {
+		if c.connType != ClientServer {
+			return nil
+		}
+	exit:
+		for _, s := range opts {
+			params := strings.SplitAfter(s, "=")
+			for _, value := range c.values {
+				if strings.HasPrefix(value, params[0]) {
+					continue exit
+				}
+			}
+			c.values = append(c.values, s)
+		}
+		return nil
+	}
 }

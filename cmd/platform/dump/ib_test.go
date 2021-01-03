@@ -23,8 +23,8 @@ func (f *fakeClient) DumpIB(file string) error {
 	return nil
 }
 
-func (c *fakeClient) Create() {
-
+func (c *fakeClient) Create() error {
+	return nil
 }
 
 func (c *fakeClient) Error() error {

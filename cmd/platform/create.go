@@ -5,6 +5,7 @@ import (
 	"github.com/onec-cli/cli/internal/platform"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	v8errors "github.com/v8platform/errors"
 	"github.com/v8platform/runner"
 	"log"
 )
@@ -81,12 +82,29 @@ func runCreate(cli cli.Cli, connPaths []string) {
 		return
 	}
 
-	for _, path := range connPaths {
+	for i, path := range connPaths {
+
+		log.Printf("infobase #%d\n", i+1)
+
 		infobase := cli.Infobase(path, defaultOptions...)
 		if infobase.Error() != nil {
+			log.Println("error: ", err)
 			continue
 		}
-		infobase.Create()
+		//opts := options()
+		err := infobase.Create()
+		if err != nil {
+			// todo много букв
+			errorContext := v8errors.GetErrorContext(err)
+			out, ok := errorContext["message"]
+			if ok {
+				err = v8errors.Internal.Wrap(err, out)
+			}
+			log.Println("error: ", err)
+		} else {
+			log.Println("infobase created")
+		}
+
 	}
 
 	//	infobases := platform.NewInfobases(connPaths, defaultOptions...)

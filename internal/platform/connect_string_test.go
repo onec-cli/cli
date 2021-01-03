@@ -202,21 +202,3 @@ func TestNewConnStrSuccess(t *testing.T) {
 		})
 	}
 }
-
-//
-//func Test_connectionString_Command(t *testing.T) {
-//	c := &connectionString{}
-//	want := "CREATEINFOBASE"
-//	got := c.Command()
-//	if got != want {
-//		t.Errorf("Command() = %v, want %v", got, want)
-//	}
-//}
-//
-//func Test_connectionString_Check(t *testing.T) {
-//	c := &connectionString{}
-//	got := c.Check()
-//	if got != nil {
-//		t.Errorf("Command() = %v, want %v", got, nil)
-//	}
-//}

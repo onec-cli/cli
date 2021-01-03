@@ -5,6 +5,84 @@ import (
 	"testing"
 )
 
+func Test_connStr_applayWithDefaults(t *testing.T) {
+	type fields struct {
+		connPath string
+		values   []string
+		connType connType
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   []string
+		want   []string
+	}{
+		{
+			name: "file connection",
+			fields: fields{
+				connPath: "/F./test",
+				values:   nil,
+				connType: File,
+			},
+			args: []string{"test"},
+			want: nil,
+		},
+		{
+			name: "client-server connection",
+			fields: fields{
+				connPath: `/Sfoo\boo`,
+				values:   nil,
+				connType: ClientServer,
+			},
+			args: []string{"param1=valueDefault1", "param2=valueDefault2"},
+			want: []string{"param1=valueDefault1", "param2=valueDefault2"},
+		},
+		{
+			name: "same parameters",
+			fields: fields{
+				connPath: `/Sfoo\boo`,
+				values:   nil,
+				connType: ClientServer,
+			},
+			args: []string{"param1=valueDefault1", "param1=valueDefault1"},
+			want: []string{"param1=valueDefault1"},
+		},
+		{
+			name: "new param",
+			fields: fields{
+				connPath: `/Sfoo\boo`,
+				values:   []string{"param1=value1"},
+				connType: ClientServer,
+			},
+			args: []string{"param2=valueDefault2"},
+			want: []string{"param1=value1", "param2=valueDefault2"},
+		},
+		{
+			name: "new doubled param",
+			fields: fields{
+				connPath: `/Sfoo\boo`,
+				values:   []string{"param1=value1", "param2=value2", "param3=value3"},
+				connType: ClientServer,
+			},
+			args: []string{"param2=valueDefault2"},
+			want: []string{"param1=value1", "param2=value2", "param3=value3"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &connStr{
+				connPath: tt.fields.connPath,
+				values:   tt.fields.values,
+				connType: tt.fields.connType,
+			}
+			c.apply(withDefaults(tt.args))
+			if !reflect.DeepEqual(c.values, tt.want) {
+				t.Errorf("defaultOptions() values = %v, want %v", c.values, tt.want)
+			}
+		})
+	}
+}
+
 func Test_connStr_clean(t *testing.T) {
 	type fields struct {
 		values []string
@@ -22,7 +100,7 @@ func Test_connStr_clean(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "have empty",
+			name: "have empty values",
 			fields: fields{
 				values: []string{
 					"",
@@ -86,85 +164,6 @@ func Test_connStr_clean(t *testing.T) {
 //		t.Run(tt.name, func(t *testing.T) {
 //			if got := makeServerStrings(tt.args.s); !reflect.DeepEqual(got, tt.want) {
 //				t.Errorf("makeServerStrings() = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
-
-//func Test_connectionString_defaultOptions(t *testing.T) {
-//	type fields struct {
-//		connectionString string
-//		values           []string
-//		connType         connType
-//	}
-//	tests := []struct {
-//		name   string
-//		fields fields
-//		args   []string
-//		want   []string
-//	}{
-//		{
-//			name: "file",
-//			fields: fields{
-//				connectionString: "/F./test",
-//				values:           nil,
-//				connType:         File,
-//			},
-//			args: []string{"test"},
-//			want: nil,
-//		},
-//		{
-//			name: "client-server",
-//			fields: fields{
-//				connectionString: `/Sfoo\boo`,
-//				values:           nil,
-//				connType:         ClientServer,
-//			},
-//			args: []string{"param1=valueDefault1", "param2=valueDefault2"},
-//			want: []string{"param1=valueDefault1", "param2=valueDefault2"},
-//		},
-//		{
-//			name: "same parameters",
-//			fields: fields{
-//				connectionString: `/Sfoo\boo`,
-//				values:           nil,
-//				connType:         ClientServer,
-//			},
-//			args: []string{"param1=valueDefault1", "param1=valueDefault1"},
-//			want: []string{"param1=valueDefault1"},
-//		},
-//		{
-//			name: "new param",
-//			fields: fields{
-//				connectionString: `/Sfoo\boo`,
-//				values:           []string{"param1=value1"},
-//				connType:         ClientServer,
-//			},
-//			args: []string{"param2=valueDefault2"},
-//			want: []string{"param1=value1", "param2=valueDefault2"},
-//		},
-//		{
-//			name: "new doubled param",
-//			fields: fields{
-//				connectionString: `/Sfoo\boo`,
-//				values:           []string{"param1=value1", "param2=value2", "param3=value3"},
-//				connType:         ClientServer,
-//			},
-//			args: []string{"param2=valueDefault2"},
-//			want: []string{"param1=value1", "param2=value2", "param3=value3"},
-//		},
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			c := &connectionString{
-//				connectionString: tt.fields.connectionString,
-//				values:           tt.fields.values,
-//				connType:         tt.fields.connType,
-//			}
-//			c.defaultOptions(tt.args)
-//			if !reflect.DeepEqual(c.values, tt.want) {
-//				t.Errorf("defaultOptions() values = %v, want %v", c.values, tt.want)
 //			}
 //		})
 //	}
