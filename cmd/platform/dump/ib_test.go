@@ -75,7 +75,6 @@ func TestNewDumpIBCommandErrors(t *testing.T) {
 }
 
 func TestNewDumpIBToFile(t *testing.T) {
-
 	foo := fs.NewFile(t, "foo.dt")
 	fooPath := foo.Path()
 	foo.Remove()

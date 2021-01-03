@@ -18,8 +18,10 @@ func logIfError(err error) {
 }
 
 type dumpOptions struct {
-	file         string
-	ibConnection string
+	file     string
+	connPath string
+	//connStr
+	//connPath
 }
 
 // NewDumpIBCommand creates a new cobra.Command for `onec platform dump ib`
@@ -41,7 +43,7 @@ to quickly create a Cobra application.`,
 			return runDumpIB(cli, opts)
 		},
 	}
-	cmd.Flags().StringVar(&opts.ibConnection, "ibconnection", "", "ibconnection (required)")
+	cmd.Flags().StringVar(&opts.connPath, "ibconnection", "", "ibconnection (required)")
 	logIfError(cmd.MarkFlagRequired("ibconnection"))
 
 	return cmd
@@ -52,7 +54,7 @@ func runDumpIB(cli cli.Cli, opts dumpOptions) error {
 		return errors.Wrap(err, "failed to export infobase")
 	}
 
-	err := cli.NewRunner(nil).DumpIB(opts.file)
+	err := cli.NewInfobase(opts.connPath).DumpIB(opts.file)
 	if err != nil {
 		return err
 	}
